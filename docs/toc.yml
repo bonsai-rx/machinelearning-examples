@@ -10,3 +10,8 @@
   href: ../examples/LinearDynamicalSystems/Kinematics/ZebrafishCentroidTracking/README.md
 - name: Foraging Mouse
   href: ../examples/LinearDynamicalSystems/Kinematics/ForagingMouse/README.md
+- name: Linear Regression
+- name: Simulated Data
+  href: ../examples/LinearDynamicalSystems/Kinematics/SimulatedData/README.md
+- name: Receptive Field Simple Cell
+  href: ../examples/LinearDynamicalSystems/LinearRegression/ReceptiveFieldSimpleCell/README.md

@@ -14,6 +14,8 @@ ZebrafishExampleVid.avi - provided by Nicholas Guilbeault in the Thiele lab at t
 
 ForagingMouseExampleVid.avi - provided by the Sainsbury Wellcome Centre Foraging Behaviour Working Group. (2023). Aeon: An open-source platform to study the neural basis of ethological behaviours over naturalistic timescales, [https://doi.org/10.5281/zenodo.8413142](https://doi.org/10.5281/zenodo.8413142)
 
+ReceptiveFieldSimpleCell.zip - provided by the authors of "Touryan, J., Felsen, G., & Dan, Y. (2005). Spatial structure of complex cell receptive fields measured with natural images. Neuron, 45(5), 781-791." [https://doi.org/10.1016/j.neuron.2005.01.029](https://doi.org/10.1016/j.neuron.2005.01.029)
+
 ### Acknowledgements
 
 Development of this package was supported by funding from the Biotechnology and Biological Sciences Research Council [grant number BB/W019132/1].
