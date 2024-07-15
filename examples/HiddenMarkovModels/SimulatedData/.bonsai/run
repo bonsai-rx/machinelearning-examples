@@ -1,0 +1,42 @@
+#!/bin/bash
+# run.sh
+
+SETUP_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+CONFIG="$SETUP_SCRIPT_DIR/Bonsai.config"
+
+cleanup() {
+    update_paths_to_windows
+}
+
+update_paths_to_linux() {
+    ASSEMBLYLOCATIONS=$(xmllint --xpath '//PackageConfiguration/AssemblyLocations/AssemblyLocation/@location' "$CONFIG" | sed -e 's/^[^"]*"//' -e 's/"$//')
+    for ASSEMBLYLOCATION in $ASSEMBLYLOCATIONS; do
+        NEWASSEMBLYLOCATION="${ASSEMBLYLOCATION//\\/\/}"
+        xmlstarlet edit --inplace --update "/PackageConfiguration/AssemblyLocations/AssemblyLocation[@location='$ASSEMBLYLOCATION']/@location" --value "$NEWASSEMBLYLOCATION" "$CONFIG"
+    done
+
+    LIBRARYFOLDERS=$(xmllint --xpath '//PackageConfiguration/LibraryFolders/LibraryFolder/@path' "$CONFIG" | sed -e 's/^[^"]*"//' -e 's/"$//')
+    for LIBRARYFOLDER in $LIBRARYFOLDERS; do
+        NEWLIBRARYFOLDER="${LIBRARYFOLDER//\\/\/}"
+        xmlstarlet edit --inplace --update "//PackageConfiguration/LibraryFolders/LibraryFolder[@path='$LIBRARYFOLDER']/@path" --value "$NEWLIBRARYFOLDER" "$CONFIG"
+    done
+}
+
+update_paths_to_windows() {
+    ASSEMBLYLOCATIONS=$(xmllint --xpath '//PackageConfiguration/AssemblyLocations/AssemblyLocation/@location' "$CONFIG" | sed -e 's/^[^"]*"//' -e 's/"$//')
+    for ASSEMBLYLOCATION in $ASSEMBLYLOCATIONS; do
+        NEWASSEMBLYLOCATION="${ASSEMBLYLOCATION//\//\\}"
+        xmlstarlet edit --inplace --update "/PackageConfiguration/AssemblyLocations/AssemblyLocation[@location='$ASSEMBLYLOCATION']/@location" --value "$NEWASSEMBLYLOCATION" "$CONFIG"
+    done
+
+    LIBRARYFOLDERS=$(xmllint --xpath '//PackageConfiguration/LibraryFolders/LibraryFolder/@path' "$CONFIG" | sed -e 's/^[^"]*"//' -e 's/"$//')
+    for LIBRARYFOLDER in $LIBRARYFOLDERS; do
+        NEWLIBRARYFOLDER="${LIBRARYFOLDER//\//\\}"
+        xmlstarlet edit --inplace --update "//PackageConfiguration/LibraryFolders/LibraryFolder[@path='$LIBRARYFOLDER']/@path" --value "$NEWLIBRARYFOLDER" "$CONFIG"
+    done
+}
+
+trap cleanup EXIT INT TERM
+update_paths_to_linux
+mono "$BONSAI_EXE_PATH" "$@"
+cleanup
