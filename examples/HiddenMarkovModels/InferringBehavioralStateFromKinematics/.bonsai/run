@@ -36,7 +36,23 @@ update_paths_to_windows() {
     done
 }
 
-trap cleanup EXIT INT TERM
-update_paths_to_linux
-mono "$BONSAI_EXE_PATH" "$@"
-cleanup
+if [[ -v BONSAI_EXE_PATH ]]; then
+    if [ ! -f "$BONSAI_EXE_PATH" ]; then
+        bash "$BONSAI_ENV_DIR"/Setup.sh
+        bash "$BONSAI_ENV_DIR"/run "$@"
+    else
+        BONSAI_VERSION=$(xmllint --xpath "//PackageConfiguration/Packages/Package[@id='Bonsai']/@version" "$CONFIG" | sed -e 's/^[^"]*"//' -e 's/"$//')       
+        if [[ -z ${BONSAI_VERSION+x} ]] && [ "$BONSAI_VERSION" \< "2.8.4" ]; then
+            echo "Updating paths to Linux format..."
+            trap cleanup EXIT INT TERM
+            update_paths_to_linux
+            mono "$BONSAI_EXE_PATH" "$@"
+            cleanup
+        else
+            mono "$BONSAI_EXE_PATH" "$@"
+        fi
+    fi
+else
+    echo "BONSAI_EXE_PATH is not set. Please set the path to the Bonsai executable."
+    return
+fi

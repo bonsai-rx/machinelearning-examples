@@ -2,7 +2,7 @@
 
 SETUP_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
-DEFAULT_VERSION="2.8.3"
+DEFAULT_VERSION="latest"
 VERSION="$DEFAULT_VERSION"
 
 while [[ "$#" -gt 0 ]]; do
