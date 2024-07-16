@@ -14,10 +14,6 @@ You must have the following installed on your PC in order to run the example wor
 
 - [Python (v3.10)](https://www.python.org/downloads/) *Note: python must be installed using the windows installer and must be added to the system PATH*
 - [Git](https://git-scm.com/downloads)
-- [Microsoft Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe)
-
-> [!TIP]
-> When running windows in a virtual machine, it is necessary to install the [OpenGL mesa drivers](https://github.com/pal1000/mesa-dist-win/releases/) on the windows VM. You can read more about it [here](https://github.com/pal1000/mesa-dist-win)
 
 #### Instructions
 
@@ -42,12 +38,11 @@ pip install numpy cython
 pip install ssm@git+https://github.com/lindermanlab/ssm@6c856ad3967941d176eb348bcd490cfaaa08ba60
 ```
 
-> [!TIP]
-> If you get an error during this step, you need to make sure that scripts are executable from the terminal. To do this, open a powershell terminal using `Run as Administrator` and enter this line:
-> ```powershell
-> set-executionpolicy remotesigned
+> [!WARNING]
+> The latest version of numpy (v2.0) is incompatible with the ssm package. To install the latest compatible version of numpy, use:
+> ```cmd
+> pip install numpy==1.26.4
 > ```
-> followed by `yes` when prompted.
 
 To create the bonsai environment and install the packages, run the powershell script:
 
@@ -79,10 +74,6 @@ You must have the following installed on your PC in order to run the example wor
 - [Mono](https://www.mono-project.com/download/stable/#download-lin)
 - [OpenCV and OpenGL binaries](https://github.com/orgs/bonsai-rx/discussions/1101) 
 
-
-> [!TIP]
-> For installing OpenCV, the simplest method is to follow the instructions on installing OpenCV from pre-built binaries
-
 #### Instructions
 
 Open up a terminal and start by cloning the [Bonsai.ML - Examples](https://github.com/bonsai-rx/machinelearning-examples) repo:
@@ -106,12 +97,11 @@ pip install numpy cython
 pip install ssm@git+https://github.com/lindermanlab/ssm@6c856ad3967941d176eb348bcd490cfaaa08ba60
 ```
 
-> [!TIP]
-> If you get an error during this step, it may be because you need to install python virtual environment package on your system. You can do so using the following:
-
-```cmd
-sudo apt install -y python3.10-venv
-```
+> [!WARNING]
+> The latest version of numpy (v2.0) is incompatible with the ssm package. To install the latest compatible version of numpy, use:
+> ```cmd
+> pip install numpy==1.26.4
+> ```
 
 Run the `Setup.sh` script using the following:
 
@@ -122,10 +112,9 @@ cd .bonsai
 
 > [!TIP]
 > The `Setup.sh` script uses the `xmllint` and `xmlstarlet` packages to convert the assembly location paths in the bonsai config file from Windows to Linux paths. If you do not have these packages already installed on your computer, you can install the `xmllint` and the `xmlstarlet` packages using:
-
-```cmd
-sudo apt install -y libxml2-utils xmlstarlet
-```
+> ```cmd
+> sudo apt install -y libxml2-utils xmlstarlet
+> ```
 
 Once the bonsai environment has been created, activate the bonsai environment and run the Bonsai executable:
 
