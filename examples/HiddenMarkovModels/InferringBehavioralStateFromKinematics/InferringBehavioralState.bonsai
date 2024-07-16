@@ -450,7 +450,7 @@
         </Workflow>
       </Expression>
       <Expression xsi:type="rx:BehaviorSubject">
-        <Name>InferredState</Name>
+        <Name>HMMStateProbabilities</Name>
       </Expression>
       <Expression xsi:type="SubscribeSubject">
         <Name>HMMParameters</Name>
@@ -489,62 +489,79 @@
         <Name>HMMFitFinished</Name>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>ImageVisualizer</Name>
+        <Name>BehavioralStateVisualizer</Name>
         <Workflow>
           <Nodes>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ImageVisualizer</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>KinematicState</Name>
+                  </Expression>
+                  <Expression xsi:type="InputMapping">
+                    <PropertyMappings>
+                      <Property Name="X" Selector="Position.X.Mean" />
+                      <Property Name="Y" Selector="Position.Y.Mean" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:CreatePoint2f">
+                      <cv:X>316.835754</cv:X>
+                      <cv:Y>92.09494</cv:Y>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Image</Name>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>KinematicState</Name>
             </Expression>
-            <Expression xsi:type="InputMapping">
-              <PropertyMappings>
-                <Property Name="X" Selector="Position.X.Mean" />
-                <Property Name="Y" Selector="Position.Y.Mean" />
-              </PropertyMappings>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p3:KinematicStateVisualizer" />
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:CreatePoint2f">
-                <cv:X>136.568085</cv:X>
-                <cv:Y>340.6199</cv:Y>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="VisualizerMapping" />
             <Expression xsi:type="SubscribeSubject">
-              <Name>Image</Name>
+              <Name>HMMStateProbabilities</Name>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p4:StateProbabilityVisualizer" />
+            </Expression>
+            <Expression xsi:type="gui:TableLayoutPanelBuilder">
+              <gui:Enabled>true</gui:Enabled>
+              <gui:Visible>true</gui:Visible>
+              <gui:ColumnCount>3</gui:ColumnCount>
+              <gui:RowCount>1</gui:RowCount>
+              <gui:ColumnStyles />
+              <gui:RowStyles />
+              <gui:CellSpans />
             </Expression>
             <Expression xsi:type="WorkflowOutput" />
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="1" To="6" Label="Source1" />
             <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="3" To="6" Label="Source2" />
             <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source3" />
+            <Edge From="6" To="7" Label="Source1" />
           </Edges>
         </Workflow>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>KinematicState</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="p3:KinematicStateVisualizer" />
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>InferredState</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="p4:StateProbabilityVisualizer" />
-      </Expression>
-      <Expression xsi:type="gui:TableLayoutPanelBuilder">
-        <gui:Enabled>true</gui:Enabled>
-        <gui:Visible>true</gui:Visible>
-        <gui:ColumnCount>3</gui:ColumnCount>
-        <gui:RowCount>1</gui:RowCount>
-        <gui:ColumnStyles />
-        <gui:RowStyles />
-        <gui:CellSpans />
       </Expression>
     </Nodes>
     <Edges>
@@ -573,12 +590,6 @@
       <Edge From="28" To="29" Label="Source1" />
       <Edge From="29" To="30" Label="Source1" />
       <Edge From="30" To="31" Label="Source1" />
-      <Edge From="32" To="33" Label="Source1" />
-      <Edge From="33" To="38" Label="Source1" />
-      <Edge From="34" To="35" Label="Source1" />
-      <Edge From="35" To="38" Label="Source2" />
-      <Edge From="36" To="37" Label="Source1" />
-      <Edge From="37" To="38" Label="Source3" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
