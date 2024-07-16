@@ -11,7 +11,8 @@ If you used the bootstrapping method, you dont have to worry about the package d
 * Bonsai - Core v2.8.1
 * Bonsai - Design v2.8.0
 * Bonsai - Editor v2.8.0
-* Bonsai - Gui Zedgraph v0.1.1
+* Bonsai - Expression Scripting v2.8.0
+* Bonsai - Gui v0.1.1
 * Bonsai - ML Hidden Markov Models v0.2.0
 * Bonsai - ML Linear Dynamical Systems v0.2.0
 * Bonsai - ML Visualizers Hidden Markov Models v0.2.0
