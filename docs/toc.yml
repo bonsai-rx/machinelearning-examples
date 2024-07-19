@@ -19,3 +19,10 @@
   href: ../examples/LinearDynamicalSystems/LinearRegression/SimulatedData/README.md
 - name: Receptive Field Simple Cell
   href: ../examples/LinearDynamicalSystems/LinearRegression/ReceptiveFieldSimpleCell/README.md
+- name: Hidden Markov Models
+- name: Getting Started
+  href: ../examples/HiddenMarkovModels/README.md
+- name: Simulated Data
+  href: ../examples/HiddenMarkovModels/SimulatedData/README.md
+- name: Inferring Behavioral State from Kinematics
+  href: ../examples/HiddenMarkovModels/InferringBehavioralStateFromKinematics/README.md
