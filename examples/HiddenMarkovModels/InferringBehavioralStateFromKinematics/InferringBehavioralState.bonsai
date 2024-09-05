@@ -5,7 +5,7 @@
                  xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
                  xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
-                 xmlns:p1="clr-namespace:Bonsai.ML.HiddenMarkovModels;assembly=Bonsai.ML.HiddenMarkovModels"
+                 xmlns:p1="clr-namespace:Bonsai.ML.Python;assembly=Bonsai.ML.Python"
                  xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
@@ -328,8 +328,8 @@
       <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.LinearDynamicalSystems:Kinematics.CreateKFModel.bonsai">
         <Name>KFmodel</Name>
         <Fps>60</Fps>
-        <Pos_x0>667.13458251953125</Pos_x0>
-        <Pos_y0>411.38992309570313</Pos_y0>
+        <Pos_x0>668.08917236328125</Pos_x0>
+        <Pos_y0>408.89923095703125</Pos_y0>
         <Vel_x0>0</Vel_x0>
         <Vel_y0>0</Vel_y0>
         <Acc_x0>0</Acc_x0>
@@ -342,12 +342,12 @@
       <Expression xsi:type="rx:BehaviorSubject">
         <Name>KFParameters</Name>
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:CreateHMMModel.bonsai">
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:CreateHMM.bonsai">
         <Name>hmm</Name>
         <NumStates>6</NumStates>
         <Dimensions>2</Dimensions>
-        <ObservationsType>Gaussian</ObservationsType>
-        <TransitionsType>Stationary</TransitionsType>
+        <ObservationsModelType>Gaussian</ObservationsModelType>
+        <TransitionsModelType>Stationary</TransitionsModelType>
       </Expression>
       <Expression xsi:type="rx:BehaviorSubject">
         <Name>HMMParameters</Name>
@@ -393,7 +393,7 @@
               <Combinator xsi:type="rx:Zip" />
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p1:FormatToPythonList" />
+              <Combinator xsi:type="p1:FormatToPython" />
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Take">
@@ -504,8 +504,8 @@
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="cv:CreatePoint2f">
-                      <cv:X>91.5667343</cv:X>
-                      <cv:Y>296.780975</cv:Y>
+                      <cv:X>682.937134</cv:X>
+                      <cv:Y>341.0978</cv:Y>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="VisualizerMapping" />
