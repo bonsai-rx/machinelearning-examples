@@ -1,14 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WorkflowBuilder Version="2.8.2"
+<WorkflowBuilder Version="2.8.5"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xmlns:py="clr-namespace:Bonsai.Scripting.Python;assembly=Bonsai.Scripting.Python"
                  xmlns:num="clr-namespace:Bonsai.Numerics;assembly=Bonsai.Numerics"
                  xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
                  xmlns:p1="clr-namespace:Bonsai.Numerics.Distributions;assembly=Bonsai.Numerics"
-                 xmlns:p2="clr-namespace:Bonsai.ML.HiddenMarkovModels;assembly=Bonsai.ML.HiddenMarkovModels"
+                 xmlns:p2="clr-namespace:Bonsai.ML.Python;assembly=Bonsai.ML.Python"
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
                  xmlns:zg="clr-namespace:Bonsai.Gui.ZedGraph;assembly=Bonsai.Gui.ZedGraph"
-                 xmlns:p3="clr-namespace:Bonsai.ML.Visualizers;assembly=Bonsai.ML.Visualizers.HiddenMarkovModels"
                  xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
@@ -23,12 +22,12 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="py:GetRuntime" />
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:CreateHMMModel.bonsai">
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:CreateHMM.bonsai">
         <Name>hmm</Name>
         <NumStates>2</NumStates>
         <Dimensions>2</Dimensions>
-        <ObservationsType>Gaussian</ObservationsType>
-        <TransitionsType>Stationary</TransitionsType>
+        <ObservationsModelType>Gaussian</ObservationsModelType>
+        <TransitionsModelType>Stationary</TransitionsModelType>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>SimulationDataWith2States</Name>
@@ -285,7 +284,7 @@
         <Name>Data</Name>
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p2:FormatToPythonList" />
+        <Combinator xsi:type="p2:FormatToPython" />
       </Expression>
       <Expression xsi:type="rx:BehaviorSubject">
         <Name>Observation</Name>
@@ -343,8 +342,6 @@
               <scr:Expression>new(it.Item1 as X, it.Item2 as Y)</scr:Expression>
             </Expression>
             <Expression xsi:type="zg:LineGraphBuilder">
-              <zg:IndexSelector />
-              <zg:ValueSelector />
               <zg:SymbolType>Circle</zg:SymbolType>
               <zg:LineWidth>0</zg:LineWidth>
               <zg:CurveSettings />
@@ -354,15 +351,11 @@
               <zg:YMin xsi:nil="true" />
               <zg:YMax xsi:nil="true" />
             </Expression>
-            <Expression xsi:type="VisualizerMapping">
-              <VisualizerType xsi:type="TypeMapping" TypeArguments="zg:LineGraphVisualizer" />
-            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
             <Expression xsi:type="SubscribeSubject">
               <Name>StateProbabilities</Name>
             </Expression>
-            <Expression xsi:type="VisualizerMapping">
-              <VisualizerType xsi:type="TypeMapping" TypeArguments="p3:StateProbabilityVisualizer" />
-            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
             <Expression xsi:type="gui:TableLayoutPanelBuilder">
               <gui:Enabled>true</gui:Enabled>
               <gui:Visible>true</gui:Visible>
