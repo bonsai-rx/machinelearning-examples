@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WorkflowBuilder Version="2.8.1"
+<WorkflowBuilder Version="2.8.2"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xmlns:py="clr-namespace:Bonsai.Scripting.Python;assembly=Bonsai.Scripting.Python"
                  xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
@@ -64,8 +64,8 @@
         <Combinator xsi:type="py:GetRuntime" />
       </Expression>
       <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.LinearDynamicalSystems:LinearRegression.CreateKFModel.bonsai">
-        <LikelihoodPrecisionCoef>0.1</LikelihoodPrecisionCoef>
-        <PriorPrecisionCoef>2</PriorPrecisionCoef>
+        <LikelihoodPrecisionCoefficient>25</LikelihoodPrecisionCoefficient>
+        <PriorPrecisionCoefficient>2</PriorPrecisionCoefficient>
         <NumFeatures>145</NumFeatures>
         <Name>model</Name>
       </Expression>
