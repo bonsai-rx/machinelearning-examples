@@ -39,7 +39,7 @@ pip install ssm@git+https://github.com/lindermanlab/ssm@6c856ad3967941d176eb348b
 ```
 
 > [!WARNING]
-> The latest version of numpy (v2.0) is incompatible with the ssm package. To install the latest compatible version of numpy, use:
+> If you have compatibility issues with the latest version of numpy (v2.0), try the following:
 > ```cmd
 > pip install numpy==1.26.4
 > ```
