@@ -30,7 +30,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:FileCapture">
-                <cv:FileName>/home/nicholas/machinelearning-examples/datasets/ForagingMouseExampleVid.avi</cv:FileName>
+                <cv:FileName>../../../datasets/ForagingMouseExampleVid.avi</cv:FileName>
                 <cv:PlaybackRate>0</cv:PlaybackRate>
                 <cv:StartPosition>0</cv:StartPosition>
                 <cv:PositionUnits>Frames</cv:PositionUnits>
