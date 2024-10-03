@@ -5,6 +5,7 @@ if [[ -v BONSAI_EXE_PATH ]]; then
     return
 fi
 BONSAI_ENV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+export BONSAI_ENV_DIR
 export BONSAI_EXE_PATH="$BONSAI_ENV_DIR/Bonsai.exe"
 export ORIGINAL_PS1="$PS1"
 export PS1="($(basename "$BONSAI_ENV_DIR")) $PS1"
