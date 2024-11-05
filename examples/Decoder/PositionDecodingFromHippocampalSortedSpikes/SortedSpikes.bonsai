@@ -26,9 +26,7 @@
                 <py:Script>import sys
 import os
 sys.path.append(os.getcwd())
-from decoder.data_loader import DataLoader
-from decoder.data_iterator import DataIterator
-from decoder.model_loader import ModelLoader</py:Script>
+from decoder import *</py:Script>
               </Combinator>
             </Expression>
             <Expression xsi:type="WorkflowOutput" />
@@ -48,7 +46,7 @@ from decoder.model_loader import ModelLoader</py:Script>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="py:Exec">
-                <py:Script>model = ModelLoader.load_model()</py:Script>
+                <py:Script>model = ModelLoader.load_sorted_spike_model()</py:Script>
               </Combinator>
             </Expression>
             <Expression xsi:type="WorkflowOutput" />
@@ -68,7 +66,7 @@ from decoder.model_loader import ModelLoader</py:Script>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="py:Exec">
-                <py:Script>data = DataLoader.load_data()</py:Script>
+                <py:Script>data = DataLoader.load_sorted_spike_data()</py:Script>
               </Combinator>
             </Expression>
             <Expression xsi:type="WorkflowOutput" />
@@ -115,6 +113,9 @@ from decoder.model_loader import ModelLoader</py:Script>
               </Combinator>
             </Expression>
             <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Expression>it[0]</scr:Expression>
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
               <scr:Expression>new(it[0] as Position, it[1] as Spikes, it[2] as Decoding, it[3] as PositionBins)</scr:Expression>
             </Expression>
             <Expression xsi:type="WorkflowOutput" />
@@ -128,6 +129,7 @@ from decoder.model_loader import ModelLoader</py:Script>
             <Edge From="5" To="6" Label="Source1" />
             <Edge From="6" To="7" Label="Source1" />
             <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -147,7 +149,7 @@ from decoder.model_loader import ModelLoader</py:Script>
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="py:Eval">
-          <py:Expression>model.decode_spikes(spikes)</py:Expression>
+          <py:Expression>model.decode(spikes)</py:Expression>
         </Combinator>
       </Expression>
       <Expression xsi:type="Combinator">
