@@ -6,6 +6,7 @@
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
                  xmlns:p1="clr-namespace:;assembly=Extensions"
                  xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
+                 xmlns:viz="clr-namespace:Bonsai.Design.Visualizers;assembly=Bonsai.Design.Visualizers"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
@@ -38,7 +39,7 @@ from decoder import *</py:Script>
         </Workflow>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>ModelLoader</Name>
+        <Name>LoadDecoder</Name>
         <Workflow>
           <Nodes>
             <Expression xsi:type="Combinator">
@@ -46,7 +47,7 @@ from decoder import *</py:Script>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="py:Exec">
-                <py:Script>model = ModelLoader.load_sorted_spike_decoder()</py:Script>
+                <py:Script>model = SortedSpikeDecoder.load()</py:Script>
               </Combinator>
             </Expression>
             <Expression xsi:type="WorkflowOutput" />
@@ -58,7 +59,7 @@ from decoder import *</py:Script>
         </Workflow>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>DataLoader</Name>
+        <Name>LoadData</Name>
         <Workflow>
           <Nodes>
             <Expression xsi:type="Combinator">
@@ -90,7 +91,7 @@ from decoder import *</py:Script>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Timer">
                 <rx:DueTime>PT0S</rx:DueTime>
-                <rx:Period>PT0.1S</rx:Period>
+                <rx:Period>PT0.01S</rx:Period>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -136,136 +137,281 @@ from decoder import *</py:Script>
       <Expression xsi:type="rx:BehaviorSubject">
         <Name>Data</Name>
       </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>Data</Name>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Spikes</Selector>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="py:Set">
-          <py:VariableName>spikes</py:VariableName>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="py:Eval">
-          <py:Expression>model.decode(spikes)</py:Expression>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p1:Posterior" />
-      </Expression>
-      <Expression xsi:type="rx:BehaviorSubject">
-        <Name>OnlineDecoderResults</Name>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Data</Selector>
-      </Expression>
-      <Expression xsi:type="rx:BehaviorSubject">
-        <Name>OnlinePosterior</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>Data</Name>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Position</Selector>
-      </Expression>
-      <Expression xsi:type="scr:ExpressionTransform">
-        <scr:Expression>Convert.ToDouble(it.ToString())</scr:Expression>
-      </Expression>
-      <Expression xsi:type="rx:BehaviorSubject">
-        <Name>Position</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>Data</Name>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Decoding</Selector>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p1:Posterior" />
-      </Expression>
-      <Expression xsi:type="rx:BehaviorSubject">
-        <Name>OfflineDecoderResults</Name>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Data</Selector>
-      </Expression>
-      <Expression xsi:type="rx:BehaviorSubject">
-        <Name>OfflinePosterior</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>Data</Name>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>PositionBins</Selector>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p1:PositionBins" />
-      </Expression>
-      <Expression xsi:type="rx:BehaviorSubject">
-        <Name>PositionBins</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>PositionBins</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>OnlineDecoderResults</Name>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>MapEstimate</Selector>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="rx:Zip" />
-      </Expression>
-      <Expression xsi:type="Index" />
-      <Expression xsi:type="rx:BehaviorSubject">
-        <Name>OnlinePositionEstimate</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>PositionBins</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>OfflineDecoderResults</Name>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>MapEstimate</Selector>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="rx:Zip" />
-      </Expression>
-      <Expression xsi:type="Index" />
-      <Expression xsi:type="rx:BehaviorSubject">
-        <Name>OfflinePositionEstimate</Name>
-      </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>Visualizer</Name>
+        <Name>RunDecoder</Name>
         <Workflow>
           <Nodes>
             <Expression xsi:type="SubscribeSubject">
-              <Name>OnlinePositionEstimate</Name>
+              <Name>Data</Name>
             </Expression>
-            <Expression xsi:type="VisualizerMapping" />
-            <Expression xsi:type="SubscribeSubject">
-              <Name>OfflinePositionEstimate</Name>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Spikes</Selector>
             </Expression>
-            <Expression xsi:type="VisualizerMapping" />
-            <Expression xsi:type="SubscribeSubject">
-              <Name>Position</Name>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="py:Set">
+                <py:VariableName>spikes</py:VariableName>
+              </Combinator>
             </Expression>
-            <Expression xsi:type="VisualizerMapping" />
-            <Expression xsi:type="SubscribeSubject">
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="py:Eval">
+                <py:Expression>model.decode(spikes)</py:Expression>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:Posterior" />
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>OnlineDecoderResults</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Data</Selector>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
               <Name>OnlinePosterior</Name>
             </Expression>
-            <Expression xsi:type="VisualizerMapping" />
             <Expression xsi:type="SubscribeSubject">
+              <Name>Data</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Position</Selector>
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Expression>Convert.ToDouble(it.ToString())</scr:Expression>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>Position</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Data</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Decoding</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:Posterior" />
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>OfflineDecoderResults</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Data</Selector>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
               <Name>OfflinePosterior</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Data</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>PositionBins</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:PositionBins" />
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>PositionBins</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>PositionBins</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>OnlineDecoderResults</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>MapEstimate</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="Index" />
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>OnlinePositionEstimate</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>PositionBins</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>OfflineDecoderResults</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>MapEstimate</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="Index" />
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>OfflinePositionEstimate</Name>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
+            <Edge From="13" To="14" Label="Source1" />
+            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="15" To="16" Label="Source1" />
+            <Edge From="16" To="17" Label="Source1" />
+            <Edge From="18" To="19" Label="Source1" />
+            <Edge From="19" To="20" Label="Source1" />
+            <Edge From="20" To="21" Label="Source1" />
+            <Edge From="22" To="25" Label="Source1" />
+            <Edge From="23" To="24" Label="Source1" />
+            <Edge From="24" To="25" Label="Source2" />
+            <Edge From="25" To="26" Label="Source1" />
+            <Edge From="26" To="27" Label="Source1" />
+            <Edge From="28" To="31" Label="Source1" />
+            <Edge From="29" To="30" Label="Source1" />
+            <Edge From="30" To="31" Label="Source2" />
+            <Edge From="31" To="32" Label="Source1" />
+            <Edge From="32" To="33" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>VisualizeDecoder</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>PositionEstimates</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="gui:LabelBuilder">
+                    <gui:Enabled>true</gui:Enabled>
+                    <gui:Visible>true</gui:Visible>
+                    <gui:Text>Online Prediction</gui:Text>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="gui:LabelBuilder">
+                    <gui:Enabled>true</gui:Enabled>
+                    <gui:Visible>true</gui:Visible>
+                    <gui:Text>Offline Acausal Prediction</gui:Text>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="gui:LabelBuilder">
+                    <gui:Enabled>true</gui:Enabled>
+                    <gui:Visible>true</gui:Visible>
+                    <gui:Text>True Position</gui:Text>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>OnlinePositionEstimate</Name>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>OfflinePositionEstimate</Name>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Position</Name>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="viz:TableLayoutPanelBuilder">
+                    <viz:ColumnCount>3</viz:ColumnCount>
+                    <viz:RowCount>2</viz:RowCount>
+                    <viz:ColumnStyles />
+                    <viz:RowStyles>
+                      <viz:RowStyle>
+                        <viz:SizeType>Percent</viz:SizeType>
+                        <viz:Height>10</viz:Height>
+                      </viz:RowStyle>
+                      <viz:RowStyle>
+                        <viz:SizeType>Percent</viz:SizeType>
+                        <viz:Height>90</viz:Height>
+                      </viz:RowStyle>
+                    </viz:RowStyles>
+                    <viz:CellSpans />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="12" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="12" Label="Source2" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="12" Label="Source3" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="7" To="12" Label="Source4" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="12" Label="Source5" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="12" Label="Source6" />
+                  <Edge From="12" To="13" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="GroupWorkflow">
+              <Name>Posteriors</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="gui:LabelBuilder">
+                    <gui:Enabled>true</gui:Enabled>
+                    <gui:Visible>true</gui:Visible>
+                    <gui:Text>Online Posterior</gui:Text>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="gui:LabelBuilder">
+                    <gui:Enabled>true</gui:Enabled>
+                    <gui:Visible>true</gui:Visible>
+                    <gui:Text>Offline Acausal Posterior</gui:Text>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>OnlinePosterior</Name>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>OfflinePosterior</Name>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="gui:TableLayoutPanelBuilder">
+                    <gui:Enabled>true</gui:Enabled>
+                    <gui:Visible>true</gui:Visible>
+                    <gui:ColumnCount>2</gui:ColumnCount>
+                    <gui:RowCount>2</gui:RowCount>
+                    <gui:ColumnStyles />
+                    <gui:RowStyles>
+                      <gui:RowStyle>
+                        <gui:SizeType>Percent</gui:SizeType>
+                        <gui:Height>10</gui:Height>
+                      </gui:RowStyle>
+                      <gui:RowStyle>
+                        <gui:SizeType>Percent</gui:SizeType>
+                        <gui:Height>90</gui:Height>
+                      </gui:RowStyle>
+                    </gui:RowStyles>
+                    <gui:CellSpans />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="8" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="8" Label="Source2" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="8" Label="Source3" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="7" To="8" Label="Source4" />
+                  <Edge From="8" To="9" Label="Source1" />
+                </Edges>
+              </Workflow>
             </Expression>
             <Expression xsi:type="VisualizerMapping" />
             <Expression xsi:type="gui:TableLayoutPanelBuilder">
               <gui:Enabled>true</gui:Enabled>
               <gui:Visible>true</gui:Visible>
-              <gui:ColumnCount>3</gui:ColumnCount>
+              <gui:ColumnCount>1</gui:ColumnCount>
               <gui:RowCount>2</gui:RowCount>
               <gui:ColumnStyles />
               <gui:RowStyles />
@@ -275,16 +421,10 @@ from decoder import *</py:Script>
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="1" To="10" Label="Source1" />
+            <Edge From="1" To="4" Label="Source1" />
             <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="10" Label="Source2" />
+            <Edge From="3" To="4" Label="Source2" />
             <Edge From="4" To="5" Label="Source1" />
-            <Edge From="5" To="10" Label="Source3" />
-            <Edge From="6" To="7" Label="Source1" />
-            <Edge From="7" To="10" Label="Source4" />
-            <Edge From="8" To="9" Label="Source1" />
-            <Edge From="9" To="10" Label="Source5" />
-            <Edge From="10" To="11" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -295,34 +435,6 @@ from decoder import *</py:Script>
       <Edge From="3" To="4" Label="Source2" />
       <Edge From="4" To="5" Label="Source1" />
       <Edge From="5" To="6" Label="Source1" />
-      <Edge From="7" To="8" Label="Source1" />
-      <Edge From="8" To="9" Label="Source1" />
-      <Edge From="9" To="10" Label="Source1" />
-      <Edge From="10" To="11" Label="Source1" />
-      <Edge From="11" To="12" Label="Source1" />
-      <Edge From="12" To="13" Label="Source1" />
-      <Edge From="13" To="14" Label="Source1" />
-      <Edge From="15" To="16" Label="Source1" />
-      <Edge From="16" To="17" Label="Source1" />
-      <Edge From="17" To="18" Label="Source1" />
-      <Edge From="19" To="20" Label="Source1" />
-      <Edge From="20" To="21" Label="Source1" />
-      <Edge From="21" To="22" Label="Source1" />
-      <Edge From="22" To="23" Label="Source1" />
-      <Edge From="23" To="24" Label="Source1" />
-      <Edge From="25" To="26" Label="Source1" />
-      <Edge From="26" To="27" Label="Source1" />
-      <Edge From="27" To="28" Label="Source1" />
-      <Edge From="29" To="32" Label="Source1" />
-      <Edge From="30" To="31" Label="Source1" />
-      <Edge From="31" To="32" Label="Source2" />
-      <Edge From="32" To="33" Label="Source1" />
-      <Edge From="33" To="34" Label="Source1" />
-      <Edge From="35" To="38" Label="Source1" />
-      <Edge From="36" To="37" Label="Source1" />
-      <Edge From="37" To="38" Label="Source2" />
-      <Edge From="38" To="39" Label="Source1" />
-      <Edge From="39" To="40" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
