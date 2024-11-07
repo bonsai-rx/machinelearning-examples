@@ -8,13 +8,19 @@ from .likelihood import LIKELIHOOD_FUNCTION
 
 import numpy as np
 import pickle as pkl
+import cupy as cp
 
 class Decoder():
     def __init__(self):
         super().__init__()
 
-    def decode(self):
+    def decode(self, data: np.ndarray):
         raise NotImplementedError
+    
+    @classmethod
+    def load(cls, filename: str):
+        with open(filename, "rb") as f:
+            return cls(pkl.load(f))
 
 class ClusterlessSpikeDecoder(Decoder):
     def __init__(self, model_dict: dict):
@@ -37,28 +43,46 @@ class ClusterlessSpikeDecoder(Decoder):
         self.place_bin_centers = self.decoder.environment.place_bin_centers_
         self.is_track_interior = self.decoder.environment.is_track_interior_.ravel(order="F")
         self.st_interior_ind = np.ix_(self.is_track_interior, self.is_track_interior)
-        self.interior_place_bin_centers = np.asarray(
-            self.place_bin_centers[self.is_track_interior], dtype=np.float32
-        )
-        self.interior_occupancy = np.asarray(
-            self.occupancy[self.is_track_interior], dtype=np.float32
-        )
+
+        self.likelihood_function = LIKELIHOOD_FUNCTION[self.decoder.clusterless_algorithm]
+
+        if "gpu" in self.decoder.clusterless_algorithm:
+            self.is_track_interior_gpu = cp.asarray(self.is_track_interior)
+            self.occupancy = cp.asarray(self.occupancy)
+            self.interior_place_bin_centers = cp.asarray(
+                self.place_bin_centers[self.is_track_interior], dtype=cp.float32
+            )
+            self.interior_occupancy = cp.asarray(
+                self.occupancy[self.is_track_interior_gpu], dtype=cp.float32
+            )
+
+        else:
+            self.is_track_interior_gpu = None
+            self.interior_place_bin_centers = np.asarray(
+                self.place_bin_centers[self.is_track_interior], dtype=np.float32
+            )
+            self.interior_occupancy = np.asarray(
+                self.occupancy[self.is_track_interior], dtype=np.float32
+            )
+
         self.n_position_bins = self.is_track_interior.shape[0]
         self.n_track_bins = self.is_track_interior.sum()
 
         self.initial_conditions = self.decoder.initial_conditions_[self.is_track_interior].astype(float)
         self.state_transition = self.decoder.state_transition_[self.st_interior_ind].astype(float)
 
-        self.likelihood_funcion = LIKELIHOOD_FUNCTION[self.decoder.clusterless_algorithm]
-
         self.posterior = None
         super().__init__()
+
+    @classmethod
+    def load(cls, filename: str = "../../../datasets/decoder_data/clusterless_spike_decoder.pkl"):
+        return super().load(filename)
     
     def decode(self,
-               multiunits: np.ndarray):
+               data: np.ndarray):
 
         likelihood = self.likelihood_function(
-            multiunits, 
+            data, 
             self.summed_ground_process_intensity, 
             self.encoding_marks, 
             self.encoding_positions, 
@@ -103,12 +127,16 @@ class SortedSpikeDecoder(Decoder):
         self.posterior = None
         super().__init__()
 
+    @classmethod
+    def load(cls, filename: str = "../../../datasets/decoder_data/sorted_spike_decoder.pkl"):
+        return super().load(filename)
+
     def decode(
             self,
-            spikes: np.ndarray
+            data: np.ndarray
         ):
 
-        likelihood = self.likelihood_function(spikes, self.conditional_intensity, self.is_track_interior)
+        likelihood = self.likelihood_function(data, self.conditional_intensity, self.is_track_interior)
 
         if self.posterior is None:
             self.posterior = np.full((1, self.n_position_bins), np.nan, dtype=float)
