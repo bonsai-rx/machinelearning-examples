@@ -27,6 +27,7 @@
                 <py:Script>import sys
 import os
 sys.path.append(os.getcwd())
+sys.path.append(os.path.join(os.getcwd(), ".venv/Scripts"))
 from decoder import *</py:Script>
               </Combinator>
             </Expression>
@@ -47,7 +48,7 @@ from decoder import *</py:Script>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="py:Exec">
-                <py:Script>decoder = ClusterlessSpikeDecoder.load("../../../datasets/decoder_data/clusterless_spike_decoder_gpu_int.pkl")</py:Script>
+                <py:Script>decoder = ClusterlessSpikeDecoder.load("../../../datasets/decoder_data/clusterless_spike_decoder_gpu_int_50Hz.pkl")</py:Script>
               </Combinator>
             </Expression>
             <Expression xsi:type="WorkflowOutput" />
