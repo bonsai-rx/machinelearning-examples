@@ -219,7 +219,7 @@ from decoder import *</py:Script>
               <Selector>Position</Selector>
             </Expression>
             <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>Convert.ToDouble(it.ToString())</scr:Expression>
+              <scr:Expression>it.ToString() == "nan" ? double.NaN : Convert.ToDouble(it.ToString())</scr:Expression>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
               <Name>Position</Name>

@@ -75,63 +75,23 @@ class DataLoader:
     @classmethod
     def load_clusterless_spike_data(cls, 
                   dataset_path: str = "../../../datasets/decoder_data") -> dict:
+        
+        decoding_results_filename = os.path.join(dataset_path, "clusterless_spike_decoding_results_50Hz.pkl")
+        if not os.path.exists(decoding_results_filename):
+            raise Exception("Dataset incorrect. Missing 'clusterless_spike_decoding_results_50Hz.pkl'")
 
-        if len([file for file in os.listdir(dataset_path) if file == "position_info.pkl" or file == "clusterless_spike_times.pkl" or file == "clusterless_spike_features.pkl" or file == "clusterless_spike_decoding_results.pkl"]) != 4:
-            raise Exception("Dataset incorrect. Missing at least one of the following files: 'position_info.pkl', 'clusterless_spike_times.pkl', 'clusterless_spike_features.pkl', 'clusterless_spike_decoding_results.pkl'")
-
-        position_data = pd.read_pickle(os.path.join(dataset_path, "position_info.pkl"))
-        position_index = position_data.index.to_numpy()
-        position_index = np.insert(position_index, 0, position_index[0] - (position_index[1] - position_index[0]))
-        position_data = position_data[["nose_x", "nose_y"]].to_numpy()
-
-        node_positions = [(120.0, 100.0),
-                            (  5.0, 100.0),
-                            (  5.0,  55.0),
-                            (120.0,  55.0),
-                            (  5.0,   8.5),
-                            (120.0,   8.5),
-                            ]
-        edges = [
-                    (3, 2),
-                    (0, 1),
-                    (1, 2),
-                    (5, 4),
-                    (4, 2),
-                ]
-        track_graph = rtc.make_track_graph(node_positions, edges)
-
-        edge_order = [
-                        (3, 2),
-                        (0, 1),
-                        (1, 2),
-                        (5, 4),
-                        (4, 2),
-                        ]
-
-        edge_spacing = [16, 0, 16, 0]
-
-        linearized_positions = tl.get_linearized_position(position_data, track_graph, edge_order=edge_order, edge_spacing=edge_spacing, use_HMM=False)
-        position_data = linearized_positions.linear_position
-
-        with open(os.path.join(dataset_path, "clusterless_spike_times.pkl"), "rb") as f:
-            spike_times = pickle.load(f)
-
-        with open(os.path.join(dataset_path, "clusterless_spike_features.pkl"), "rb") as f:
-            spike_features = pickle.load(f)
-
-        features = np.ones((len(position_data), len(spike_features[0][0]), len(spike_times)), dtype=float) * np.nan
-        for n in range(len(spike_times)):
-            in_spikes_window = np.digitize(spike_times[n], position_index)
-            features[in_spikes_window, :, n] = spike_features[n]
-
-        with open(os.path.join(dataset_path, "clusterless_spike_decoding_results.pkl"), "rb") as f:
-            results = pickle.load(f)["decoding_results"]
-            position_bins = results.position.to_numpy()[np.newaxis]
-            decoding_results = results.acausal_posterior.to_numpy()[:,np.newaxis]
+        with open(decoding_results_filename, "rb") as f:
+            results = pickle.load(f)
+            decoding_results = results["decoding_results"]
+            position_bins = decoding_results.position.to_numpy()[np.newaxis]
+            decoding_results = decoding_results.acausal_posterior.to_numpy()[:,np.newaxis]
+            features = results["features"]
+            time = results["time"]
+            linear_position = results["linear_position"]
 
         return {
-            "position_data": position_data,
-            "spike_times": spike_times,
+            "linear_position": linear_position,
+            "time": time,
             "features": features,
             "decoding_results": decoding_results,
             "position_bins": position_bins
