@@ -6,6 +6,8 @@ In the following example, you can find how to use the spike sorted decoder or cl
 
 We thank Eric Denovellis for sharing his data and for his help with the decoder. If you use this example dataset, please consider citing the work: Joshi, A., Denovellis, E.L., Mankili, A. et al. Dynamic synchronization between hippocampal representations and stepping. Nature 617, 125–131 (2023). https://doi.org/10.1038/s41586-023-05928-6.
 
+You can download the HippocampalTetrodeRecordings.zip file here: https://doi.org/10.5281/zenodo.10629221. The workflow expects the data to be placed into the datasets folder. It should be structured like this: `/path/to/machinelearning-examples/datasets/decoder_data/*`
+
 ## Algorithm
 
 The neural decoder consists of a bayesian state-space model and point-processes to decode a latent variable (position) from neural spiking activity. To read more about the theory behind the model and how the algorithm works, we refer the reader to: Denovellis, E.L., Gillespie, A.K., Coulter, M.E., et al. Hippocampal replay of experience at real-world speeds. eLife 10, e64505 (2021). https://doi.org/10.7554/eLife.64505.
