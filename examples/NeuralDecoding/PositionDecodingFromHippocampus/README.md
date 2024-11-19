@@ -48,7 +48,7 @@ Alternatively, you can copy the `.bonsai\Bonsai.config` file into your Bonsai in
 
 The package contains 2 different models, one which takes as input sorted spike activity, and another which uses clusterless spike activity taken from raw ephys recordings. 
 
-You first need to train the decoder model and save it to disk. Open up the `notebooks` folder and select either `SortedSpikeDecoder.ipynb` or `ClusterlessDecoder.ipynb` depending on which model type you would like to use. Run the notebook. Once completed, this will create 2 new files: 
+You first need to train the decoder model and save it to disk. Open up the `notebooks` folder and select either `SortedSpikeDecoder.ipynb` or `ClusterlessSpikeDecoder.ipynb` depending on which model type you would like to use. Run the notebook. Once completed, this will create 2 new files: 
 1) `datasets\decoder_data\[ModelType]_decoder.pkl` for the trained decoder model
 2) `datasets\decoder_data\[ModelType]_decoding_results.pkl` for the predictions.
 
