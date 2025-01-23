@@ -11,7 +11,7 @@ The dataset used in this example can be obtained by going to [this url](https://
 Below is the example workflow.
 
 :::workflow
-![Image Classification - Pretrained](FashionMnistPretrainedModel.bonsai)
+![Image Classification - Pretrained](NeuralNetsPretrainedModel.bonsai)
 :::
 
 The workflow can be broken down into the following sections.
