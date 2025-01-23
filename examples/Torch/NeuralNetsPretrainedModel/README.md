@@ -6,6 +6,8 @@ In the following example, you will see how to use a pretrained torch model to pe
 
 The dataset used in this example can be obtained by going to [this url](https://github.com/zalandoresearch/fashion-mnist). Only the datasets `t10k-images-idx3-ubyte.gz` and `t10k-labels-idx1-ubyte.gz` are needed for this example. The files need to be converted into images and text files and placed into the `datasets/fashion-mnist` folder. You can convert the compressed files into the correct formats using [this tool](https://github.com/ncguilbeault/fashion-mnist-dataset-export).
 
+This example uses the model weights contained in the `fashion-mnist.model.bin` file inside of the [Bonsai.ML - Datasets repository](https://doi.org/10.5281/zenodo.10629221). The workflow expects the model weights to be placed inside of the `datasets` folder.
+
 ### Workflow
 
 Below is the example workflow.
