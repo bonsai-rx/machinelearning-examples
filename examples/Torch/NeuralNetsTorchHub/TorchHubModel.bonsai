@@ -15,10 +15,12 @@
         </Combinator>
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p1:ToTensor" />
+        <Combinator xsi:type="p1:ToTensor">
+          <p1:Type xsi:nil="true" />
+        </Combinator>
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p1:ConvertDataType">
+        <Combinator xsi:type="p1:ConvertScalarType">
           <p1:Type>Float32</p1:Type>
         </Combinator>
       </Expression>
