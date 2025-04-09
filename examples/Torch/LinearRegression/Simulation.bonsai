@@ -6,9 +6,7 @@
                  xmlns:p1="clr-namespace:Bonsai.Numerics.Distributions;assembly=Bonsai.Numerics"
                  xmlns:p2="clr-namespace:Bonsai.ML.Torch;assembly=Bonsai.ML.Torch"
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
-                 xmlns:p3="clr-namespace:Bonsai.ML.Torch.Index;assembly=Bonsai.ML.Torch"
-                 xmlns:p4="clr-namespace:Bonsai.ML.Torch.LinearAlgebra;assembly=Bonsai.ML.Torch"
-                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                 xmlns:p3="clr-namespace:Bonsai.ML.Torch.LinearAlgebra;assembly=Bonsai.ML.Torch"
                  xmlns:zg="clr-namespace:Bonsai.Gui.ZedGraph;assembly=Bonsai.Gui.ZedGraph"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
@@ -263,7 +261,9 @@
         <Name>XYData</Name>
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p2:ToTensor" />
+        <Combinator xsi:type="p2:ToTensor">
+          <p2:Type xsi:nil="true" />
+        </Combinator>
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="rx:Skip">
@@ -291,7 +291,9 @@
         <Name>XYData</Name>
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p2:ToTensor" />
+        <Combinator xsi:type="p2:ToTensor">
+          <p2:Type xsi:nil="true" />
+        </Combinator>
       </Expression>
       <Expression xsi:type="scr:ExpressionTransform">
         <scr:Expression>it.unsqueeze(0)</scr:Expression>
@@ -308,8 +310,8 @@
         <Name>TensorData</Name>
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p3:Index">
-          <p3:Indexes>:,0:2</p3:Indexes>
+        <Combinator xsi:type="p2:Index">
+          <p2:Value>:,0:2</p2:Value>
         </Combinator>
       </Expression>
       <Expression xsi:type="rx:BehaviorSubject">
@@ -319,8 +321,8 @@
         <Name>TensorData</Name>
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p3:Index">
-          <p3:Indexes>:,2</p3:Indexes>
+        <Combinator xsi:type="p2:Index">
+          <p2:Value>:,2</p2:Value>
         </Combinator>
       </Expression>
       <Expression xsi:type="scr:ExpressionTransform">
@@ -342,7 +344,7 @@
         <scr:Expression>it.Item1.T.mm(it.Item2)</scr:Expression>
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p4:Inv" />
+        <Combinator xsi:type="p3:Inverse" />
       </Expression>
       <Expression xsi:type="SubscribeSubject">
         <Name>TensorX</Name>
@@ -362,8 +364,8 @@
       <Expression xsi:type="scr:ExpressionTransform">
         <scr:Expression>it.Item1.mm(it.Item2)</scr:Expression>
       </Expression>
-      <Expression xsi:type="p2:ToArray">
-        <p2:Type xsi:type="TypeMapping" TypeArguments="sys:Double" />
+      <Expression xsi:type="p2:ConvertToArray">
+        <p2:Type>Float32</p2:Type>
       </Expression>
       <Expression xsi:type="scr:ExpressionTransform">
         <scr:Expression>new(it[0] as B0, it[1] as B1)</scr:Expression>
@@ -375,14 +377,15 @@
         <Name>Coefficients</Name>
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p2:Linspace">
+        <Combinator xsi:type="p2:LinSpace">
           <p2:Start>-1</p2:Start>
           <p2:End>1</p2:End>
           <p2:Count>10</p2:Count>
+          <p2:Type xsi:nil="true" />
         </Combinator>
       </Expression>
-      <Expression xsi:type="p2:ToArray">
-        <p2:Type xsi:type="TypeMapping" TypeArguments="sys:Single" />
+      <Expression xsi:type="p2:ConvertToArray">
+        <p2:Type>Float32</p2:Type>
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="rx:WithLatestFrom" />
