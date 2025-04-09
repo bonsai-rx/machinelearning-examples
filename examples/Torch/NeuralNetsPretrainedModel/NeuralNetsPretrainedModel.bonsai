@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <WorkflowBuilder Version="2.8.5"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
@@ -303,7 +303,7 @@
           <Nodes>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:LoadModuleFromArchitecture">
-                <p2:ModelArchitecture>MNIST</p2:ModelArchitecture>
+                <p2:ModelArchitecture>Mnist</p2:ModelArchitecture>
                 <p2:ModelWeightsPath>../../../datasets/fashion-mnist.model.bin</p2:ModelWeightsPath>
                 <p2:NumClasses>10</p2:NumClasses>
               </Combinator>
@@ -327,10 +327,12 @@
               <Name>Image</Name>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:ToTensor" />
+              <Combinator xsi:type="p3:ToTensor">
+                <p3:Type xsi:nil="true" />
+              </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:ConvertDataType">
+              <Combinator xsi:type="p3:ConvertScalarType">
                 <p3:Type>Float32</p3:Type>
               </Combinator>
             </Expression>
