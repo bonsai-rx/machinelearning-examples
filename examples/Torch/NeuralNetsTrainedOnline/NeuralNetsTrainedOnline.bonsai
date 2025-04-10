@@ -349,7 +349,7 @@
                               </Expression>
                               <Expression xsi:type="Combinator">
                                 <Combinator xsi:type="cv:LoadImage">
-                                  <cv:FileName></cv:FileName>
+                                  <cv:FileName />
                                   <cv:Mode>Grayscale</cv:Mode>
                                 </Combinator>
                               </Expression>
@@ -363,7 +363,7 @@
                               </Expression>
                               <Expression xsi:type="Combinator">
                                 <Combinator xsi:type="io:ReadAllText">
-                                  <io:Path></io:Path>
+                                  <io:Path />
                                 </Combinator>
                               </Expression>
                               <Expression xsi:type="Combinator">
@@ -601,6 +601,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p3:InitializeTorchDevice">
                 <p3:DeviceType>CUDA</p3:DeviceType>
+                <p3:DeviceIndex>-1</p3:DeviceIndex>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -609,6 +610,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p3:InitializeTorchDevice">
                 <p3:DeviceType>CPU</p3:DeviceType>
+                <p3:DeviceIndex>-1</p3:DeviceIndex>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -624,7 +626,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p4:LoadModuleFromArchitecture">
-                <p4:ModelArchitecture>MNIST</p4:ModelArchitecture>
+                <p4:ModelArchitecture>Mnist</p4:ModelArchitecture>
                 <p4:NumClasses>10</p4:NumClasses>
               </Combinator>
             </Expression>
@@ -649,7 +651,9 @@
               <Name>Image</Name>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:ToTensor" />
+              <Combinator xsi:type="p3:ToTensor">
+                <p3:Type xsi:nil="true" />
+              </Combinator>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>CUDA</Name>
@@ -663,7 +667,7 @@
               <Combinator xsi:type="p3:ToDevice" />
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:ConvertDataType">
+              <Combinator xsi:type="p3:ConvertScalarType">
                 <p3:Type>Float32</p3:Type>
               </Combinator>
             </Expression>
@@ -703,7 +707,9 @@
               <Name>Label</Name>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:ToTensor" />
+              <Combinator xsi:type="p3:ToTensor">
+                <p3:Type xsi:nil="true" />
+              </Combinator>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>CUDA</Name>
@@ -717,7 +723,7 @@
               <Combinator xsi:type="p3:ToDevice" />
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:ConvertDataType">
+              <Combinator xsi:type="p3:ConvertScalarType">
                 <p3:Type>Int64</p3:Type>
               </Combinator>
             </Expression>
@@ -880,7 +886,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p4:Backward">
                 <p4:Optimizer>Adam</p4:Optimizer>
-                <p4:Loss>NLLLoss</p4:Loss>
+                <p4:Loss>NegativeLogLikelihood</p4:Loss>
               </Combinator>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
