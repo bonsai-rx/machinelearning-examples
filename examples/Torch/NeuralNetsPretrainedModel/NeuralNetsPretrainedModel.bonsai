@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <WorkflowBuilder Version="2.8.5"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
-                 xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
                  xmlns:p1="clr-namespace:;assembly=Extensions"
-                 xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
+                 xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:p2="clr-namespace:Bonsai.ML.Torch;assembly=Bonsai.ML.Torch"
+                 xmlns:p3="clr-namespace:Bonsai.ML.Torch.NeuralNets;assembly=Bonsai.ML.Torch"
+                 xmlns:p4="clr-namespace:OpenCV.Net;assembly=OpenCV.Net"
+                 xmlns:p5="clr-namespace:Bonsai.ML.Torch.Vision;assembly=Bonsai.ML.Torch"
+                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
-                 xmlns:p2="clr-namespace:Bonsai.ML.Torch.NeuralNets;assembly=Bonsai.ML.Torch"
-                 xmlns:p3="clr-namespace:Bonsai.ML.Torch;assembly=Bonsai.ML.Torch"
-                 xmlns:p4="clr-namespace:Bonsai.ML.Torch.Vision;assembly=Bonsai.ML.Torch"
                  xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
@@ -18,54 +18,31 @@
         <Workflow>
           <Nodes>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="io:EnumerateFiles">
-                <io:Path>../../../datasets/fashion-mnist</io:Path>
-                <io:SearchPattern>t10kLabel*.txt</io:SearchPattern>
-                <io:SearchOption>TopDirectoryOnly</io:SearchOption>
+              <Combinator xsi:type="p1:FashionMnistLoader">
+                <p1:Path>../../../datasets</p1:Path>
               </Combinator>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:ToArray" />
+            <Expression xsi:type="rx:ReplaySubject">
+              <Name>FashionMnistData</Name>
+              <rx:BufferSize xsi:nil="true" />
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p1:SortStringArray">
-                <p1:Prefix>t10kLabel</p1:Prefix>
-                <p1:Suffix>.txt</p1:Suffix>
-              </Combinator>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>FashionMnistData</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>TestImages</Selector>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Concat" />
             </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>LabelFilename</Name>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>FashionMnistData</Name>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="io:EnumerateFiles">
-                <io:Path>../../../datasets/fashion-mnist</io:Path>
-                <io:SearchPattern>t10kImage*.png</io:SearchPattern>
-                <io:SearchOption>TopDirectoryOnly</io:SearchOption>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:ToArray" />
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p1:SortStringArray">
-                <p1:Prefix>t10kImage</p1:Prefix>
-                <p1:Suffix>.png</p1:Suffix>
-              </Combinator>
+            <Expression xsi:type="MemberSelector">
+              <Selector>TestLabels</Selector>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Concat" />
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>ImageFilename</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>ImageFilename</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>LabelFilename</Name>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Timer">
@@ -76,7 +53,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Zip" />
             </Expression>
-            <Expression xsi:type="rx:SelectMany">
+            <Expression xsi:type="GroupWorkflow">
               <Name>LoadData</Name>
               <Workflow>
                 <Nodes>
@@ -84,71 +61,19 @@
                     <Name>Source1</Name>
                   </Expression>
                   <Expression xsi:type="MemberSelector">
-                    <Selector>Item1</Selector>
-                  </Expression>
-                  <Expression xsi:type="rx:BehaviorSubject">
-                    <Name>Image</Name>
-                  </Expression>
-                  <Expression xsi:type="MemberSelector">
                     <Selector>Item2</Selector>
                   </Expression>
-                  <Expression xsi:type="rx:BehaviorSubject">
+                  <Expression xsi:type="MulticastSubject">
                     <Name>Label</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item1</Selector>
+                  </Expression>
+                  <Expression xsi:type="MulticastSubject">
+                    <Name>Image</Name>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Zip" />
-                  </Expression>
-                  <Expression xsi:type="rx:SelectMany">
-                    <Workflow>
-                      <Nodes>
-                        <Expression xsi:type="SubscribeSubject">
-                          <Name>Image</Name>
-                        </Expression>
-                        <Expression xsi:type="PropertyMapping">
-                          <PropertyMappings>
-                            <Property Name="FileName" />
-                          </PropertyMappings>
-                        </Expression>
-                        <Expression xsi:type="Combinator">
-                          <Combinator xsi:type="cv:LoadImage">
-                            <cv:FileName></cv:FileName>
-                            <cv:Mode>Unchanged</cv:Mode>
-                          </Combinator>
-                        </Expression>
-                        <Expression xsi:type="SubscribeSubject">
-                          <Name>Label</Name>
-                        </Expression>
-                        <Expression xsi:type="PropertyMapping">
-                          <PropertyMappings>
-                            <Property Name="Path" />
-                          </PropertyMappings>
-                        </Expression>
-                        <Expression xsi:type="Combinator">
-                          <Combinator xsi:type="io:ReadAllText">
-                            <io:Path></io:Path>
-                          </Combinator>
-                        </Expression>
-                        <Expression xsi:type="Combinator">
-                          <Combinator xsi:type="rx:Zip" />
-                        </Expression>
-                        <Expression xsi:type="Combinator">
-                          <Combinator xsi:type="rx:Take">
-                            <rx:Count>1</rx:Count>
-                          </Combinator>
-                        </Expression>
-                        <Expression xsi:type="WorkflowOutput" />
-                      </Nodes>
-                      <Edges>
-                        <Edge From="0" To="1" Label="Source1" />
-                        <Edge From="1" To="2" Label="Source1" />
-                        <Edge From="2" To="6" Label="Source1" />
-                        <Edge From="3" To="4" Label="Source1" />
-                        <Edge From="4" To="5" Label="Source1" />
-                        <Edge From="5" To="6" Label="Source2" />
-                        <Edge From="6" To="7" Label="Source1" />
-                        <Edge From="7" To="8" Label="Source1" />
-                      </Edges>
-                    </Workflow>
                   </Expression>
                   <Expression xsi:type="WorkflowOutput" />
                 </Nodes>
@@ -160,27 +85,16 @@
                   <Edge From="3" To="4" Label="Source1" />
                   <Edge From="4" To="5" Label="Source2" />
                   <Edge From="5" To="6" Label="Source1" />
-                  <Edge From="6" To="7" Label="Source1" />
                 </Edges>
               </Workflow>
             </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item1</Selector>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:TakeLast">
+                <rx:Count>1</rx:Count>
+              </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:Grayscale" />
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>Image</Name>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item2</Selector>
-            </Expression>
-            <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>Convert.ToInt32(it)</scr:Expression>
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>Label</Name>
+              <Combinator xsi:type="rx:Repeat" />
             </Expression>
             <Expression xsi:type="rx:Defer">
               <Name>CategoryLabels</Name>
@@ -276,24 +190,17 @@
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="1" To="2" Label="Source1" />
             <Edge From="2" To="3" Label="Source1" />
             <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="9" Label="Source1" />
             <Edge From="5" To="6" Label="Source1" />
             <Edge From="6" To="7" Label="Source1" />
-            <Edge From="7" To="8" Label="Source1" />
-            <Edge From="8" To="9" Label="Source1" />
-            <Edge From="10" To="13" Label="Source1" />
-            <Edge From="11" To="13" Label="Source2" />
-            <Edge From="12" To="13" Label="Source3" />
+            <Edge From="7" To="9" Label="Source2" />
+            <Edge From="8" To="9" Label="Source3" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
             <Edge From="13" To="14" Label="Source1" />
-            <Edge From="14" To="15" Label="Source1" />
-            <Edge From="14" To="18" Label="Source1" />
-            <Edge From="15" To="16" Label="Source1" />
-            <Edge From="16" To="17" Label="Source1" />
-            <Edge From="18" To="19" Label="Source1" />
-            <Edge From="19" To="20" Label="Source1" />
-            <Edge From="21" To="22" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -302,20 +209,48 @@
         <Workflow>
           <Nodes>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p2:LoadModuleFromArchitecture">
-                <p2:ModelArchitecture>Mnist</p2:ModelArchitecture>
-                <p2:ModelWeightsPath>../../../datasets/fashion-mnist.model.bin</p2:ModelWeightsPath>
-                <p2:NumClasses>10</p2:NumClasses>
+              <Combinator xsi:type="p2:InitializeTorchDevice">
+                <p2:DeviceType>CPU</p2:DeviceType>
+                <p2:DeviceIndex>-1</p2:DeviceIndex>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>CUDA</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:InitializeTorchDevice">
+                <p2:DeviceType>CPU</p2:DeviceType>
+                <p2:DeviceIndex>-1</p2:DeviceIndex>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>CPU</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>CUDA</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Device" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p3:LoadModuleFromArchitecture">
+                <p3:ModelArchitecture>Mnist</p3:ModelArchitecture>
+                <p3:ModelWeightsPath>../../../datasets/fashion-mnist.model.bin</p3:ModelWeightsPath>
+                <p3:NumClasses>10</p3:NumClasses>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
               <Name>Model</Name>
             </Expression>
-            <Expression xsi:type="WorkflowOutput" />
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -323,25 +258,26 @@
         <Name>ProcessImage</Name>
         <Workflow>
           <Nodes>
+            <Expression xsi:type="rx:BehaviorSubject" TypeArguments="p4:IplImage">
+              <rx:Name>Image</rx:Name>
+            </Expression>
             <Expression xsi:type="SubscribeSubject">
-              <Name>Image</Name>
+              <Name>CUDA</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Device" />
+              </PropertyMappings>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:ToTensor">
-                <p3:Type xsi:nil="true" />
+              <Combinator xsi:type="p2:ToTensor">
+                <p2:Type>Float32</p2:Type>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:ConvertScalarType">
-                <p3:Type>Float32</p3:Type>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>it.unsqueeze(0)</scr:Expression>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="FloatProperty">
-                <Value>256</Value>
+              <Combinator xsi:type="p2:CreateTensor">
+                <p2:Type>Float32</p2:Type>
+                <p2:Values>[256]</p2:Values>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -349,39 +285,71 @@
             </Expression>
             <Expression xsi:type="Divide" />
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:Reshape">
-                <p3:Dimensions>
-                  <p3:long>1</p3:long>
-                  <p3:long>1</p3:long>
-                  <p3:long>28</p3:long>
-                  <p3:long>28</p3:long>
-                </p3:Dimensions>
+              <Combinator xsi:type="p2:Reshape">
+                <p2:Dimensions>
+                  <p2:long>1</p2:long>
+                  <p2:long>1</p2:long>
+                  <p2:long>28</p2:long>
+                  <p2:long>28</p2:long>
+                </p2:Dimensions>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p4:Normalize">
-                <p4:Means>
-                  <p4:double>0.1307</p4:double>
-                </p4:Means>
-                <p4:StdDevs>
-                  <p4:double>0.3081</p4:double>
-                </p4:StdDevs>
+              <Combinator xsi:type="p5:Normalize">
+                <p5:Means>
+                  <p5:double>0.1307</p5:double>
+                </p5:Means>
+                <p5:StdDevs>
+                  <p5:double>0.3081</p5:double>
+                </p5:StdDevs>
               </Combinator>
             </Expression>
-            <Expression xsi:type="rx:PublishSubject">
+            <Expression xsi:type="rx:BehaviorSubject">
               <Name>ProcessedImage</Name>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject" TypeArguments="sys:Int32">
+              <rx:Name>Label</rx:Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>CUDA</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Device" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:ToTensor">
+                <p2:Type>Int64</p2:Type>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Reshape">
+                <p2:Dimensions>
+                  <p2:long>1</p2:long>
+                </p2:Dimensions>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>ProcessedLabel</Name>
             </Expression>
           </Nodes>
           <Edges>
-            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="0" To="3" Label="Source1" />
             <Edge From="1" To="2" Label="Source1" />
-            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="2" To="3" Label="Source2" />
+            <Edge From="2" To="4" Label="Source1" />
             <Edge From="3" To="5" Label="Source1" />
             <Edge From="4" To="5" Label="Source2" />
             <Edge From="5" To="6" Label="Source1" />
             <Edge From="6" To="7" Label="Source1" />
             <Edge From="7" To="8" Label="Source1" />
             <Edge From="8" To="9" Label="Source1" />
+            <Edge From="10" To="13" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="13" Label="Source2" />
+            <Edge From="13" To="14" Label="Source1" />
+            <Edge From="14" To="15" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -401,7 +369,18 @@
               </PropertyMappings>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p2:Forward" />
+              <Combinator xsi:type="p3:Forward" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>CPU</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Device" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:ToDevice" />
             </Expression>
             <Expression xsi:type="scr:ExpressionTransform">
               <scr:Expression>Convert.ToInt32(it.argmax().ReadCpuInt64(0))</scr:Expression>
@@ -414,8 +393,11 @@
             <Edge From="0" To="3" Label="Source1" />
             <Edge From="1" To="2" Label="Source1" />
             <Edge From="2" To="3" Label="Source2" />
-            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="3" To="6" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source2" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>

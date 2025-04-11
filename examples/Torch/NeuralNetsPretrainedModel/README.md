@@ -4,7 +4,7 @@ In the following example, you will see how to use a pretrained torch model to pe
 
 ### Dataset
 
-The dataset used in this example can be obtained by going to [this url](https://github.com/zalandoresearch/fashion-mnist). Only the datasets `t10k-images-idx3-ubyte.gz` and `t10k-labels-idx1-ubyte.gz` are needed for this example. The files need to be converted into images and text files and placed into the `datasets/fashion-mnist` folder. You can convert the compressed files into the correct formats using [this tool](https://github.com/ncguilbeault/fashion-mnist-dataset-export).
+The dataset used in this example can be obtained by going to [this url](https://github.com/zalandoresearch/fashion-mnist?tab=readme-ov-file#get-the-data). Only the files `t10k-images-idx3-ubyte.gz` and `t10k-labels-idx1-ubyte.gz` are needed for this example. The workflow expects the datasets to be placed into the `datasets` folder.
 
 This example uses the model weights contained in the `fashion-mnist.model.bin` file inside of the [Bonsai.ML - Datasets repository](https://doi.org/10.5281/zenodo.10629221). The workflow expects the model weights to be placed inside of the `datasets` folder.
 
@@ -17,8 +17,8 @@ Below is the example workflow.
 :::
 
 The workflow can be broken down into the following sections.
-1. `LoadData` - This group node first enumerates and sorts all of the files inside the `datasets/fashion-mnist` directory matching the `t10k*` pattern and loads each image and label iteratively at a 1 Hz sampling rate.
-2. `LoadPretrainedModel` - Loads the pretrained model and saves it to a subject. In this example, only the model weights are saved. Since TorchSharp cannot infer the models architecture from the binary weights file alone, we need to specify what model architecture the model weights correspond to. The weights in this example are based on the `MNIST` model architecture.
-3. `ProcessImage` - Takes the original image in `IplImage` format, converts it to a `Tensor` format of the appropriate shape and data type, and normalizes the image.
-4. `RunInference` - The model runs a forward pass on the `ProcessedImage`, and the argmax of the output is taken as our prediction.
+1. `LoadData` - Uses a custom source node called `FashionMnistLoader` to load the dataset files and output a `FashionMnistData` class which contains the testing images and testing labels. The images and labels are iterated to process individual images and labels.
+2. `LoadPretrainedModel` - Loads the pretrained model and saves it to a subject. Since TorchSharp cannot infer the model's architecture from a binary weights file, it is necessary to specify the correct model architecture corresponding to the pretrained weights, otherwise it will fail. The weights in this example are based on the `Mnist` model architecture, a convolutional neural network with 2 convolutional layers followed by 2 fully connected layers.
+3. `ProcessImage` - Converts the `IplImage` object and label into `Tensor` objects.
+4. `RunInference` - Runs a forward pass on the `ProcessedImage`. The argmax of the output is taken as the predicted class label.
 5. `Visualizer` - Displays the most recent image along with the history of observed target labels and the models predicted labels.
