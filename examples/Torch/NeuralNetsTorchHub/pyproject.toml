@@ -1,0 +1,11 @@
+[project]
+name = "neuralnetstorchhub"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.2.5",
+    "timm>=1.0.15",
+    "torch>=2.7.0",
+]
