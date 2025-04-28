@@ -1,5 +1,6 @@
 - name: Overview
   href: ../README.md
+
 - name: Linear Dynamical Systems
 - name: Getting Started
   href: ../examples/LinearDynamicalSystems/README.md
@@ -19,6 +20,7 @@
   href: ../examples/LinearDynamicalSystems/LinearRegression/SimulatedData/README.md
 - name: Receptive Field Simple Cell
   href: ../examples/LinearDynamicalSystems/LinearRegression/ReceptiveFieldSimpleCell/README.md
+
 - name: Hidden Markov Models
 - name: Getting Started
   href: ../examples/HiddenMarkovModels/README.md
@@ -26,3 +28,17 @@
   href: ../examples/HiddenMarkovModels/SimulatedData/README.md
 - name: Inferring Behavioral State from Kinematics
   href: ../examples/HiddenMarkovModels/InferringBehavioralStateFromKinematics/README.md
+
+- name: Torch
+- name: Linear Regression
+  href: ../examples/Torch/LinearRegression/README.md
+- name: Linux Example
+  href: ../examples/Torch/RunningOnLinux/README.md
+
+- name: Torch Models
+- name: Pretrained Neural Network for Image Classification
+  href: ../examples/Torch/NeuralNetsPretrainedModel/README.md
+- name: Downloading and Running a TorchHub Model
+  href: ../examples/Torch/NeuralNetsTorchHub/README.md
+- name: Training a Neural Network Online
+  href: ../examples/Torch/NeuralNetsTrainedOnline/README.md
