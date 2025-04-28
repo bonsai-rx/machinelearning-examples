@@ -5,9 +5,10 @@
                  xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
                  xmlns:p2="clr-namespace:Bonsai.ML.PointProcessDecoder;assembly=Bonsai.ML.PointProcessDecoder"
                  xmlns:dsp="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp"
-                 xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
                  xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
-                 xmlns:p3="clr-namespace:OpenCV.Net;assembly=OpenCV.Net"
+                 xmlns:p3="clr-namespace:PointProcessDecoder.Core.Decoder;assembly=PointProcessDecoder.Core"
+                 xmlns:p4="clr-namespace:Bonsai.ML.PointProcessDecoder.Design;assembly=Bonsai.ML.PointProcessDecoder.Design"
+                 xmlns:viz="clr-namespace:Bonsai.Design.Visualizers;assembly=Bonsai.Design.Visualizers"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
@@ -45,24 +46,23 @@
               <Combinator xsi:type="p2:CreatePointProcessModel">
                 <p2:Name>PointProcessModel</p2:Name>
                 <p2:ScalarType xsi:nil="true" />
-                <p2:StateSpaceType>DiscreteUniform</p2:StateSpaceType>
-                <p2:StateSpaceDimensions>2</p2:StateSpaceDimensions>
-                <p2:MinStateSpace>
+                <p2:Dimensions>2</p2:Dimensions>
+                <p2:MinRange>
                   <p2:double>370</p2:double>
                   <p2:double>495</p2:double>
-                </p2:MinStateSpace>
-                <p2:MaxStateSpace>
+                </p2:MinRange>
+                <p2:MaxRange>
                   <p2:double>690</p2:double>
                   <p2:double>635</p2:double>
-                </p2:MaxStateSpace>
-                <p2:StepsStateSpace>
+                </p2:MaxRange>
+                <p2:Steps>
                   <p2:long>50</p2:long>
                   <p2:long>50</p2:long>
-                </p2:StepsStateSpace>
-                <p2:ObservationBandwidth>
+                </p2:Steps>
+                <p2:Bandwidth>
                   <p2:double>15</p2:double>
                   <p2:double>15</p2:double>
-                </p2:ObservationBandwidth>
+                </p2:Bandwidth>
                 <p2:EncoderType>SortedSpikes</p2:EncoderType>
                 <p2:KernelLimit>20000</p2:KernelLimit>
                 <p2:NUnits>564</p2:NUnits>
@@ -70,10 +70,8 @@
                 <p2:MarkChannels xsi:nil="true" />
                 <p2:EstimationMethod>KernelCompression</p2:EstimationMethod>
                 <p2:DistanceThreshold>1.5</p2:DistanceThreshold>
-                <p2:LikelihoodType>Poisson</p2:LikelihoodType>
-                <p2:IgnoreNoSpikes>false</p2:IgnoreNoSpikes>
                 <p2:TransitionsType>RandomWalk</p2:TransitionsType>
-                <p2:SigmaRandomWalk>1</p2:SigmaRandomWalk>
+                <p2:SigmaRandomWalk>10</p2:SigmaRandomWalk>
                 <p2:DecoderType>StateSpaceDecoder</p2:DecoderType>
                 <p2:StayProbability xsi:nil="true" />
               </Combinator>
@@ -93,9 +91,9 @@
           <Nodes>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="dsp:MatrixReader">
-                <dsp:Path>..\..\..\datasets\StriatumNeuropixelsRecordings\position.bin</dsp:Path>
+                <dsp:Path>..\..\..\datasets\StriatalNeuropixelRecordings\position.bin</dsp:Path>
                 <dsp:Offset>0</dsp:Offset>
-                <dsp:SampleRate>100</dsp:SampleRate>
+                <dsp:SampleRate>60</dsp:SampleRate>
                 <dsp:ChannelCount>2</dsp:ChannelCount>
                 <dsp:BufferLength>1</dsp:BufferLength>
                 <dsp:Depth>F64</dsp:Depth>
@@ -104,9 +102,9 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="dsp:MatrixReader">
-                <dsp:Path>..\..\..\datasets\StriatumNeuropixelsRecordings\spike_counts.bin</dsp:Path>
+                <dsp:Path>..\..\..\datasets\StriatalNeuropixelRecordings\spike_counts.bin</dsp:Path>
                 <dsp:Offset>0</dsp:Offset>
-                <dsp:SampleRate>100</dsp:SampleRate>
+                <dsp:SampleRate>60</dsp:SampleRate>
                 <dsp:ChannelCount>564</dsp:ChannelCount>
                 <dsp:BufferLength>1</dsp:BufferLength>
                 <dsp:Depth>F64</dsp:Depth>
@@ -118,24 +116,6 @@
             </Expression>
             <Expression xsi:type="MemberSelector">
               <Selector>Item1</Selector>
-            </Expression>
-            <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>new(it[0].Val0 as X, it[1].Val0 as Y)</scr:Expression>
-            </Expression>
-            <Expression xsi:type="InputMapping">
-              <PropertyMappings>
-                <Property Name="X" Selector="X" />
-                <Property Name="Y" Selector="Y" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:CreatePoint2d">
-                <cv:X>0</cv:X>
-                <cv:Y>0</cv:Y>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="rx:PublishSubject">
-              <Name>TruePosition</Name>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>CUDA</Name>
@@ -153,16 +133,22 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:Clone" />
             </Expression>
-            <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>it.squeeze(null).unsqueeze(0)</scr:Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:Reshape">
+                <p1:Dimensions>
+                  <p1:long>1</p1:long>
+                  <p1:long>2</p1:long>
+                </p1:Dimensions>
+              </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:ConvertScalarType">
                 <p1:Type>Float32</p1:Type>
               </Combinator>
             </Expression>
-            <Expression xsi:type="rx:PublishSubject">
+            <Expression xsi:type="rx:ReplaySubject">
               <Name>Covariate</Name>
+              <rx:BufferSize xsi:nil="true" />
             </Expression>
             <Expression xsi:type="MemberSelector">
               <Selector>Item2</Selector>
@@ -183,16 +169,22 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:Clone" />
             </Expression>
-            <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>it.squeeze(null).unsqueeze(0)</scr:Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:Reshape">
+                <p1:Dimensions>
+                  <p1:long>1</p1:long>
+                  <p1:long>564</p1:long>
+                </p1:Dimensions>
+              </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:ConvertScalarType">
                 <p1:Type>Int32</p1:Type>
               </Combinator>
             </Expression>
-            <Expression xsi:type="rx:PublishSubject">
+            <Expression xsi:type="rx:ReplaySubject">
               <Name>SortedSpikeCounts</Name>
+              <rx:BufferSize xsi:nil="true" />
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>Covariate</Name>
@@ -209,138 +201,317 @@
             <Edge From="0" To="2" Label="Source1" />
             <Edge From="1" To="2" Label="Source2" />
             <Edge From="2" To="3" Label="Source1" />
-            <Edge From="2" To="15" Label="Source1" />
-            <Edge From="3" To="4" Label="Source1" />
-            <Edge From="3" To="10" Label="Source1" />
+            <Edge From="2" To="11" Label="Source1" />
+            <Edge From="3" To="6" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
-            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="5" To="6" Label="Source2" />
             <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
             <Edge From="8" To="9" Label="Source1" />
-            <Edge From="9" To="10" Label="Source2" />
-            <Edge From="10" To="11" Label="Source1" />
-            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="11" To="14" Label="Source1" />
             <Edge From="12" To="13" Label="Source1" />
-            <Edge From="13" To="14" Label="Source1" />
-            <Edge From="15" To="18" Label="Source1" />
+            <Edge From="13" To="14" Label="Source2" />
+            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="15" To="16" Label="Source1" />
             <Edge From="16" To="17" Label="Source1" />
-            <Edge From="17" To="18" Label="Source2" />
-            <Edge From="18" To="19" Label="Source1" />
+            <Edge From="17" To="18" Label="Source1" />
             <Edge From="19" To="20" Label="Source1" />
             <Edge From="20" To="21" Label="Source1" />
             <Edge From="21" To="22" Label="Source1" />
-            <Edge From="23" To="24" Label="Source1" />
-            <Edge From="24" To="25" Label="Source1" />
-            <Edge From="25" To="26" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>Covariate</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>SortedSpikeCounts</Name>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="rx:Zip" />
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p2:Encode">
-          <p2:Name>PointProcessModel</p2:Name>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>SortedSpikeCounts</Name>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p2:Decode">
-          <p2:Name>PointProcessModel</p2:Name>
-          <p2:IgnoreNoSpikes>false</p2:IgnoreNoSpikes>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>TruePosition</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping" />
-      <Expression xsi:type="rx:PublishSubject" TypeArguments="p3:Point2d">
-        <rx:Name>MAP</rx:Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping" />
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p2:GetDecoderData">
-          <p2:Name>PointProcessModel</p2:Name>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>MaximumAPosterioriEstimate</Selector>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="p1:Index">
-          <p1:Value>-1</p1:Value>
-        </Combinator>
-      </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>ConvertToPoint2d</Name>
+        <Name>Encoding</Name>
         <Workflow>
           <Nodes>
-            <Expression xsi:type="WorkflowInput">
-              <Name>Source1</Name>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Value" DisplayName="BatchSize" />
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p1:Index">
-                <p1:Value>0</p1:Value>
+              <Combinator xsi:type="IntProperty">
+                <Value>1000</Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>EncodingBatchSize</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Covariate</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>EncodingBatchSize</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Count" />
+                <Property Name="Skip" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:BufferCount">
+                <rx:Count>1000</rx:Count>
+                <rx:Skip>1000</rx:Skip>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p1:Index">
-                <p1:Value>1</p1:Value>
+              <Combinator xsi:type="p1:Concat">
+                <p1:Dimension>0</p1:Dimension>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SortedSpikeCounts</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>EncodingBatchSize</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Count" />
+                <Property Name="Skip" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:BufferCount">
+                <rx:Count>1000</rx:Count>
+                <rx:Skip>1000</rx:Skip>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:Concat">
+                <p1:Dimension>0</p1:Dimension>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Zip" />
             </Expression>
-            <Expression xsi:type="InputMapping">
-              <PropertyMappings>
-                <Property Name="X" Selector="Item1" />
-                <Property Name="Y" Selector="Item2" />
-              </PropertyMappings>
-            </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:CreatePoint2d">
-                <cv:X>0</cv:X>
-                <cv:Y>0</cv:Y>
+              <Combinator xsi:type="p2:Encode">
+                <p2:Name>PointProcessModel</p2:Name>
               </Combinator>
             </Expression>
             <Expression xsi:type="WorkflowOutput" />
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="0" To="2" Label="Source1" />
-            <Edge From="1" To="3" Label="Source1" />
-            <Edge From="2" To="3" Label="Source2" />
-            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="3" To="6" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
-            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="5" To="6" Label="Source2" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="13" Label="Source1" />
+            <Edge From="8" To="11" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source2" />
+            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="13" Label="Source2" />
+            <Edge From="13" To="14" Label="Source1" />
+            <Edge From="14" To="15" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
-      <Expression xsi:type="MulticastSubject">
-        <Name>MAP</Name>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>Decoding</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Value" DisplayName="BatchSize" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="IntProperty">
+                <Value>10</Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>DecodingBatchSize</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SortedSpikeCounts</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>DecodingBatchSize</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Count" />
+                <Property Name="Skip" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:BufferCount">
+                <rx:Count>10</rx:Count>
+                <rx:Skip>10</rx:Skip>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:Concat">
+                <p1:Dimension>0</p1:Dimension>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Decode">
+                <p2:Name>PointProcessModel</p2:Name>
+                <p2:IgnoreNoSpikes>false</p2:IgnoreNoSpikes>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Covariate</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:Index">
+                <p1:Value>0</p1:Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ConvertToPoint2d</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p1:Index">
+                      <p1:Value>0</p1:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p1:Index">
+                      <p1:Value>1</p1:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="InputMapping">
+                    <PropertyMappings>
+                      <Property Name="X" Selector="Item1" />
+                      <Property Name="Y" Selector="Item2" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:CreatePoint2d">
+                      <cv:X>478.33084106445313</cv:X>
+                      <cv:Y>541.2369384765625</cv:Y>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="2" Label="Source1" />
+                  <Edge From="1" To="3" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source2" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="rx:BehaviorSubject" TypeArguments="p3:DecoderData">
+              <rx:Name>DecoderData</rx:Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>MaximumAPosterioriEstimate</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:Index">
+                <p1:Value>-1</p1:Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ConvertToPoint2d</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p1:Index">
+                      <p1:Value>0</p1:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p1:Index">
+                      <p1:Value>1</p1:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="InputMapping">
+                    <PropertyMappings>
+                      <Property Name="X" Selector="Item1" />
+                      <Property Name="Y" Selector="Item2" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:CreatePoint2d">
+                      <cv:X>487.551025390625</cv:X>
+                      <cv:Y>575</cv:Y>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="2" Label="Source1" />
+                  <Edge From="1" To="3" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source2" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:GetDecoderData">
+                <p2:Name>PointProcessModel</p2:Name>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="MulticastSubject">
+              <Name>DecoderData</Name>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p4:PosteriorVisualizer" />
+            </Expression>
+            <Expression xsi:type="viz:TableLayoutPanelBuilder">
+              <viz:ColumnCount>1</viz:ColumnCount>
+              <viz:RowCount>1</viz:RowCount>
+              <viz:ColumnStyles />
+              <viz:RowStyles />
+              <viz:CellSpans />
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="3" To="6" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source2" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="18" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="18" Label="Source2" />
+            <Edge From="13" To="14" Label="Source1" />
+            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="15" To="16" Label="Source1" />
+            <Edge From="16" To="17" Label="Source1" />
+            <Edge From="17" To="18" Label="Source3" />
+            <Edge From="18" To="19" Label="Source1" />
+            <Edge From="19" To="20" Label="Source1" />
+            <Edge From="20" To="21" Label="Source1" />
+            <Edge From="21" To="22" Label="Source1" />
+          </Edges>
+        </Workflow>
       </Expression>
     </Nodes>
-    <Edges>
-      <Edge From="2" To="4" Label="Source1" />
-      <Edge From="3" To="4" Label="Source2" />
-      <Edge From="4" To="5" Label="Source1" />
-      <Edge From="6" To="7" Label="Source1" />
-      <Edge From="7" To="12" Label="Source1" />
-      <Edge From="8" To="9" Label="Source1" />
-      <Edge From="9" To="12" Label="Source2" />
-      <Edge From="10" To="11" Label="Source1" />
-      <Edge From="11" To="12" Label="Source3" />
-      <Edge From="12" To="13" Label="Source1" />
-      <Edge From="13" To="14" Label="Source1" />
-      <Edge From="14" To="15" Label="Source1" />
-      <Edge From="15" To="16" Label="Source1" />
-    </Edges>
+    <Edges />
   </Workflow>
 </WorkflowBuilder>
