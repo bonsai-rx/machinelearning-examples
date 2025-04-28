@@ -20,7 +20,7 @@
   href: ../examples/LinearDynamicalSystems/LinearRegression/SimulatedData/README.md
 - name: Receptive Field Simple Cell
   href: ../examples/LinearDynamicalSystems/LinearRegression/ReceptiveFieldSimpleCell/README.md
-
+  
 - name: Hidden Markov Models
 - name: Getting Started
   href: ../examples/HiddenMarkovModels/README.md
@@ -42,3 +42,13 @@
   href: ../examples/Torch/NeuralNetsTorchHub/README.md
 - name: Training a Neural Network Online
   href: ../examples/Torch/NeuralNetsTrainedOnline/README.md
+
+- name: Point Process Decoder
+- name: Decode Position from Hippocampus using Sorted Spikes
+  href: ../examples/PointProcessDecoder/DecodePositionFromHippocampusSortedUnits/README.md
+- name: Decode Position from Hippocampus using Clusterless Marks
+  href: ../examples/PointProcessDecoder/DecodePositionFromHippocampusClusterless/README.md
+- name: Decode Position from Striatum using Sorted Spikes
+  href: ../examples/PointProcessDecoder/DecodePositionFromStriatumSortedUnits/README.md
+- name: Decode Position from Hippocampal Sorted Units and Classify Latent Dynamics
+  href: ../examples/PointProcessDecoder/ClassifyPositionFromHippocampusSortedUnits/README.md

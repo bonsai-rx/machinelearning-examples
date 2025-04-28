@@ -36,7 +36,7 @@ In the `Encoding` group, the `Covariate` and `SortedSpikeCounts` data are batche
 
 #### Decoding
 
-In the `Decoding` group, only the `SortedSpikeCounts` data are passed to the `Decode` node. The `SortedSpikeCounts` are batched into chunks using the value of `DecodingBatchSize`, set to `10`. Notice that the `DecodingBatchSize` does not need to be the same as the `EncodngBatchSize`. The output of `Decode` is a `Tensor` object corresponding to the posterior distribution evaluated over the covariate range. The posterior tensor object is passed to the `GetDecoderData` node, which returns a `DecoderData` struct containing useful properties of the posterior.
+In the `Decoding` group, only the `SortedSpikeCounts` data are passed to the `Decode` node. The `SortedSpikeCounts` are batched into chunks using the value of `DecodingBatchSize`, set to `10`. Notice that the `DecodingBatchSize` does not need to be the same as the `EncodingBatchSize`. The output of `Decode` is a `Tensor` object corresponding to the posterior distribution evaluated over the covariate range. The posterior tensor object is passed to the `GetDecoderData` node, which returns a `DecoderData` struct containing useful properties of the posterior.
 
 Both the `Covariate` position data and `MaximumAPosterioriEstimate` of the posterior are converted to `Point2d` objects and overlaid onto the `PosteriorVisualizer` using externalized `VisualizerMapping` nodes.
 
