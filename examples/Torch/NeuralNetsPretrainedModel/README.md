@@ -4,9 +4,9 @@ In the following example, you will see how to use a pretrained torch model to pe
 
 ### Dataset
 
-The dataset used in this example can be obtained by going to [this url](https://github.com/zalandoresearch/fashion-mnist?tab=readme-ov-file#get-the-data). Only the files `t10k-images-idx3-ubyte.gz` and `t10k-labels-idx1-ubyte.gz` are needed for this example. The workflow expects the datasets to be placed into the `datasets` folder.
+The dataset used in this example can be obtained by going to [this url](https://github.com/zalandoresearch/fashion-mnist?tab=readme-ov-file#get-the-data). Only the files `t10k-images-idx3-ubyte.gz` and `t10k-labels-idx1-ubyte.gz` are needed for this example. The workflow expects the datasets to be placed into a folder called `fashion-mnist` inside of the `datasets` folder. The paths should be `datasets/fashion-mnist/t10k-images-idx3-ubyte.gz` and `datasets/fashion-mnist/t10k-labels-idx1-ubyte.gz`.
 
-This example uses the model weights contained in the `fashion-mnist.model.bin` file inside of the [Bonsai.ML - Datasets repository](https://doi.org/10.5281/zenodo.10629221). The workflow expects the model weights to be placed inside of the `datasets` folder.
+This example uses the model weights contained in the `fashion-mnist.model.bin` file inside of the [Bonsai.ML - Datasets repository](https://doi.org/10.5281/zenodo.10629221). The workflow expects the model weights to be placed inside of the `datasets` folder. The path should be `datasets/fashion-mnist.model.bin`.
 
 ### Workflow
 
@@ -22,3 +22,7 @@ The workflow can be broken down into the following sections.
 3. `ProcessImage` - Converts the `IplImage` object and label into `Tensor` objects.
 4. `RunInference` - Runs a forward pass on the `ProcessedImage`. The argmax of the output is taken as the predicted class label.
 5. `Visualizer` - Displays the most recent image along with the history of observed target labels and the models predicted labels.
+
+The demo should look like this when running:
+
+![]()

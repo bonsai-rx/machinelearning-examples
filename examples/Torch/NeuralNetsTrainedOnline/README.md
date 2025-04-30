@@ -4,7 +4,7 @@ In the following example, you will see how to train a neural network online to p
 
 ### Dataset
 
-The dataset used in this example can be obtained by going to [this url](https://github.com/zalandoresearch/fashion-mnist?tab=readme-ov-file#get-the-data). This example uses both the training and testing datasets, so download all 4 of the urls. The files need to be converted into images and text files and placed into the `datasets/fashion-mnist` folder. You can convert the compressed files into the correct formats using [this tool](https://github.com/ncguilbeault/fashion-mnist-dataset-export).
+The dataset used in this example can be obtained by going to [this url](https://github.com/zalandoresearch/fashion-mnist?tab=readme-ov-file#get-the-data). This example uses both the training and testing datasets, so download all 4 of the urls. The workflow expects the datasets to be placed into the `datasets/fashion-mnist` folder. The path should be `datasets/fashion-mnist/*.gz`.
 
 ### Workflow
 
