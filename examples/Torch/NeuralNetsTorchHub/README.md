@@ -2,15 +2,17 @@
 
 In the following example, you will see how to run inference using a model downloaded directly from [torch hub](https://pytorch.org/hub/). The model we will be using is called the `MiDaS` model, which takes 2D images in RGB space and converts them into 1D images representing depth - more information about this model can be found [here](https://pytorch.org/hub/intelisl_midas_v2/).
 
-### Python Script
+### Instructions
 
-This example contains a python script called `torchhub_download.py`. To run this, you need to have a python environment with the pytorch package installed. To install pytorch in python, you can follow the [instructions on the pytorch website](https://pytorch.org/get-started/locally/). Afterwards, you need to change to the example directory and run:
+This example uses the [uv manager](https://docs.astral.sh/uv/) to manage package dependencies and boostrap the environment. To install `uv`, follow the instructions [here](https://docs.astral.sh/uv/getting-started/installation/). 
+
+The folder contains a Python script which uses the [PyTorch](https://pytorch.org) library. The python script, `torchhub_download.py`, is designed to automatically download the `MiDaS` PyTorch model from the web and place it into the correct folder for the Bonsai workflow. To bootstrap the Python environment and run the script, open up a terminal and enter:
 
 ```cmd
-python torchhub_download.py
+uv run torchhub_download.py
 ```
 
-This will download the model from torch hub and save it to a `.pt` file. The file will be saved inside of the `models` directory.
+Once the script is finished, the model will be saved as `MiDaS.pt` inside of the `models` directory.
 
 ### Workflow
 
