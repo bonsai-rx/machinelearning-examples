@@ -9,10 +9,12 @@ using System.Reactive.Linq;
 using OpenCV.Net;
 
 [Combinator]
-[Description("")]
+[Description("Custom operator to load the Fashion MNIST dataset.")]
 [WorkflowElementCategory(ElementCategory.Source)]
 public class FashionMnistLoader
 {
+    [Description("Path to the Fashion MNIST dataset folder. The folder should contain the gzipped files for images and labels.")]
+    [Editor("Bonsai.Design.FolderNameEditor, Bonsai.Design", DesignTypes.UITypeEditor)]
     public string Path { get; set; }
 
     private void DecompressDataAndRead<T>(string gzPath, Action<BinaryReader, List<T>> readAction, List<T> list)
