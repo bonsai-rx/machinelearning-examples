@@ -22,7 +22,3 @@ The workflow can be broken down into the following sections.
 3. `ProcessImage` - Converts the `IplImage` object and label into `Tensor` objects.
 4. `RunInference` - Runs a forward pass on the `ProcessedImage`. The argmax of the output is taken as the predicted class label.
 5. `Visualizer` - Displays the most recent image along with the history of observed target labels and the models predicted labels.
-
-The demo should look like this when running:
-
-![]()
