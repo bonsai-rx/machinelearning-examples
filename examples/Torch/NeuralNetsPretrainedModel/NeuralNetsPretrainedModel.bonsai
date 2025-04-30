@@ -19,7 +19,7 @@
           <Nodes>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:FashionMnistLoader">
-                <p1:Path>../../../datasets</p1:Path>
+                <p1:Path>../../../datasets/fashion-mnist</p1:Path>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:ReplaySubject">

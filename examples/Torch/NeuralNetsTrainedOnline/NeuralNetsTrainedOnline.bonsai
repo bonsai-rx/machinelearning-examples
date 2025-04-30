@@ -19,7 +19,7 @@
           <Nodes>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:FashionMnistLoader">
-                <p1:Path>../../../datasets</p1:Path>
+                <p1:Path>../../../datasets/fashion-mnist</p1:Path>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:ReplaySubject">
@@ -65,24 +65,6 @@
                   <Expression xsi:type="SubscribeSubject">
                     <Name>LoadedData</Name>
                   </Expression>
-                  <Expression xsi:type="MemberSelector">
-                    <Selector>Item1</Selector>
-                  </Expression>
-                  <Expression xsi:type="MulticastSubject">
-                    <Name>Image</Name>
-                  </Expression>
-                  <Expression xsi:type="SubscribeSubject">
-                    <Name>LoadedData</Name>
-                  </Expression>
-                  <Expression xsi:type="MemberSelector">
-                    <Selector>Item2</Selector>
-                  </Expression>
-                  <Expression xsi:type="MulticastSubject">
-                    <Name>Label</Name>
-                  </Expression>
-                  <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="rx:Zip" />
-                  </Expression>
                   <Expression xsi:type="WorkflowOutput" />
                 </Nodes>
                 <Edges>
@@ -96,12 +78,6 @@
                   <Edge From="7" To="8" Label="Source1" />
                   <Edge From="8" To="9" Label="Source1" />
                   <Edge From="10" To="11" Label="Source1" />
-                  <Edge From="11" To="12" Label="Source1" />
-                  <Edge From="12" To="16" Label="Source1" />
-                  <Edge From="13" To="14" Label="Source1" />
-                  <Edge From="14" To="15" Label="Source1" />
-                  <Edge From="15" To="16" Label="Source2" />
-                  <Edge From="16" To="17" Label="Source1" />
                 </Edges>
               </Workflow>
             </Expression>
@@ -152,6 +128,9 @@
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Zip" />
                   </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item1,Item2</Selector>
+                  </Expression>
                   <Expression xsi:type="rx:BehaviorSubject">
                     <Name>LoadedData</Name>
                   </Expression>
@@ -166,24 +145,6 @@
                   <Expression xsi:type="SubscribeSubject">
                     <Name>LoadedData</Name>
                   </Expression>
-                  <Expression xsi:type="MemberSelector">
-                    <Selector>Item1</Selector>
-                  </Expression>
-                  <Expression xsi:type="MulticastSubject">
-                    <Name>Image</Name>
-                  </Expression>
-                  <Expression xsi:type="SubscribeSubject">
-                    <Name>LoadedData</Name>
-                  </Expression>
-                  <Expression xsi:type="MemberSelector">
-                    <Selector>Item2</Selector>
-                  </Expression>
-                  <Expression xsi:type="MulticastSubject">
-                    <Name>Label</Name>
-                  </Expression>
-                  <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="rx:Zip" />
-                  </Expression>
                   <Expression xsi:type="WorkflowOutput" />
                 </Nodes>
                 <Edges>
@@ -197,13 +158,8 @@
                   <Edge From="7" To="8" Label="Source1" />
                   <Edge From="8" To="9" Label="Source1" />
                   <Edge From="9" To="10" Label="Source1" />
-                  <Edge From="11" To="12" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
                   <Edge From="12" To="13" Label="Source1" />
-                  <Edge From="13" To="17" Label="Source1" />
-                  <Edge From="14" To="15" Label="Source1" />
-                  <Edge From="15" To="16" Label="Source1" />
-                  <Edge From="16" To="17" Label="Source2" />
-                  <Edge From="17" To="18" Label="Source1" />
                 </Edges>
               </Workflow>
             </Expression>
@@ -212,6 +168,18 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Switch" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="MulticastSubject">
+              <Name>Image</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="MulticastSubject">
+              <Name>Label</Name>
             </Expression>
             <Expression xsi:type="rx:Defer">
               <Name>CategoryLabels</Name>
@@ -312,7 +280,11 @@
             <Edge From="4" To="5" Label="Source1" />
             <Edge From="5" To="6" Label="Source2" />
             <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="7" To="10" Label="Source1" />
             <Edge From="8" To="9" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -834,7 +806,7 @@
               </PropertyMappings>
             </Expression>
             <Expression xsi:type="gui:ButtonBuilder">
-              <gui:Enabled>true</gui:Enabled>
+              <gui:Enabled>false</gui:Enabled>
               <gui:Visible>true</gui:Visible>
               <gui:Text>Stop Training</gui:Text>
             </Expression>
