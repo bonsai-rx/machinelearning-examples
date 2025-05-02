@@ -19,7 +19,7 @@ The workflow can be broken down into the following sections.
 2. `LoadModel` - Loads the model and saves it to a subject. The model is initialized with random weights and will be trained online.
 3. `ProcessInputs` - Converts the image, which is a type of `IplImage`, into a `Tensor` object. The tensor is normalized and reshaped. The training label is also converted into a `Tensor` object.
 4. `RunInference` - Runs forward inference on the `ProcessedImage`, and the argmax of the output is taken as the predicted class label.
-5. `OnlineLearning` - Image tensors are collected in batches. Once a batch is filled, the model trains against the loss between it's prediction and the provided label by performing stochastic gradient optimization to update it's weights. It uses the `Adam` optimizer and computes the `NegativeLogLikelihood`.
+5. `OnlineLearning` - Image tensors are collected in batches. Once a batch is filled, the model trains against the loss between its prediction and the provided label by performing stochastic gradient optimization to update its weights. It uses the `Adam` optimizer and computes the `NegativeLogLikelihood`.
 6. `Visualizer` - Displays the most recent image along with the history of observed target labels and the models predicted labels.
 7. `Controller` - A button to control when the training will stop and when the test images will start.
 
