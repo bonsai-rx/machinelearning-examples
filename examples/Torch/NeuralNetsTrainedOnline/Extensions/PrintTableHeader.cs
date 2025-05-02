@@ -12,6 +12,7 @@ public class PrintTableHeader
 {
     [Description("The number of characters to pad the output with.")]
     public int Padding { get; set; }
+    
     public IObservable<string> Process()
     {
         return Observable.Return(

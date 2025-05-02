@@ -13,6 +13,7 @@ public class PrintTable
 {
     [Description("The number of characters to pad the output with.")]
     public int Padding { get; set; }
+    
     public IObservable<string> Process(IObservable<Tuple<IplImage, string, string, int>> source)
     {
         return source.Select(value => {
