@@ -13,7 +13,7 @@ You can download the `StriatalNeuropixelRecordings.zip` dataset here: [https://d
 Below is the example workflow.
 
 :::workflow
-![](OnlineSortedSpikesDecoder.bonsai)
+![](OnlineSortedSpikeDecoder.bonsai)
 :::
 
 #### Load Model

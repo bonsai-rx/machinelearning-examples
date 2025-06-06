@@ -15,7 +15,7 @@ Once downloaded, you will need to extract the contents of the zip file into the 
 Below is the example workflow.
 
 :::workflow
-![OnlineSortedSpikesDecoder](OnlineSortedSpikesDecoder.bonsai)
+![OnlineSortedSpikeDecoder](OnlineSortedSpikeDecoder.bonsai)
 :::
 
 #### Load Model

@@ -15,7 +15,7 @@ Once downloaded, the data need to be extracted into the `datasets` folder. The w
 Below is the example workflow.
 
 :::workflow
-![OnlineSortedSpikesClassifier](OnlineSortedSpikesClassifier.bonsai)
+![OnlineSortedSpikeClassifier](OnlineSortedSpikeClassifier.bonsai)
 :::
 
 #### Load Model
