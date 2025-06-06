@@ -16,6 +16,10 @@ ForagingMouseExampleVid.avi - provided by the Sainsbury Wellcome Centre Foraging
 
 ReceptiveFieldSimpleCell.zip - provided by the authors of "Touryan, J., Felsen, G., & Dan, Y. (2005). Spatial structure of complex cell receptive fields measured with natural images. Neuron, 45(5), 781-791." [https://doi.org/10.1016/j.neuron.2005.01.029](https://doi.org/10.1016/j.neuron.2005.01.029)
 
+HippocampalTetrodeRecordings.zip - provided by the authors of "Joshi, A., Denovellis, E.L., Mankili, A. et al. (2023). Dynamic synchronization between hippocampal representations and stepping. Nature, 617, 125–131." [https://doi.org/10.1038/s41586-023-05928-6](https://doi.org/10.1038/s41586-023-05928-6)
+
+StriatumNeuropixelsRecordings.zip - provided by the authors of "Thompson, E., Rollik, L., Waked, B. et al. (2024). Replay of procedural experience is independent of the hippocampus. bioRxiv, 2024.06.05.597547." [https://doi.org/10.1101/2024.06.05.597547](https://doi.org/10.1101/2024.06.05.597547)
+
 ### Acknowledgements
 
 Development of this package was supported by funding from the Biotechnology and Biological Sciences Research Council [grant number BB/W019132/1].
