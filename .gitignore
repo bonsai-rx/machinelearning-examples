@@ -12,6 +12,7 @@ obj
 .venv
 Packages
 Gallery
+Settings
 *.csv
 *.bin
 __pycache__
