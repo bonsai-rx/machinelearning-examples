@@ -12,6 +12,7 @@ obj
 .venv
 Packages
 Gallery
+**/.bonsai/Settings
 *.csv
 *.bin
 __pycache__
