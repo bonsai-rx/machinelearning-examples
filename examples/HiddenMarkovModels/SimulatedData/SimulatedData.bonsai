@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WorkflowBuilder Version="2.8.5"
+<WorkflowBuilder Version="2.9.0"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xmlns:py="clr-namespace:Bonsai.Scripting.Python;assembly=Bonsai.Scripting.Python"
                  xmlns:num="clr-namespace:Bonsai.Numerics;assembly=Bonsai.Numerics"
@@ -26,8 +26,8 @@
         <Name>hmm</Name>
         <NumStates>2</NumStates>
         <Dimensions>2</Dimensions>
-        <ObservationsModelType>Gaussian</ObservationsModelType>
-        <TransitionsModelType>Stationary</TransitionsModelType>
+        <ObservationModelType>Gaussian</ObservationModelType>
+        <TransitionModelType>Stationary</TransitionModelType>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>SimulationDataWith2States</Name>
