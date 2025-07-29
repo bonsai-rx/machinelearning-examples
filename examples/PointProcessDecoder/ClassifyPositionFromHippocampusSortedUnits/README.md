@@ -50,5 +50,5 @@ To visualize the output, open the visualizer of the `Classification` group. The 
 
 In the example, the model's predictions at the start will be inaccurate. As the model encodes more data over time, it becomes increasingly better at predicting the covariate data. Here is how it will look after encoding 50000 data points:
 
-![](OnlineClassifierHippocampalTetrodeRecordingsSortedSpikes.gif)
+![](OnlineClassifierHippocampalTetrodeRecordingsSortedUnits.gif)
 
