@@ -48,5 +48,5 @@
   href: ../examples/PointProcessDecoder/DecodePositionFromHippocampusClusterless/README.md
 - name: Decode Position from Striatum using Sorted Spikes
   href: ../examples/PointProcessDecoder/DecodePositionFromStriatumSortedUnits/README.md
-- name: Decode Position from Hippocampal Sorted Units and Classify Latent Dynamics
+- name: Classify Dynamics and Decode Position from Hippocampal Sorted Units 
   href: ../examples/PointProcessDecoder/ClassifyPositionFromHippocampusSortedUnits/README.md
