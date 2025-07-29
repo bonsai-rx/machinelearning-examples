@@ -32,8 +32,6 @@
 - name: Torch
 - name: Linear Regression
   href: ../examples/Torch/LinearRegression/README.md
-- name: Linux Example
-  href: ../examples/Torch/RunningOnLinux/README.md
 
 - name: Torch Models
 - name: Pretrained Neural Network for Image Classification
