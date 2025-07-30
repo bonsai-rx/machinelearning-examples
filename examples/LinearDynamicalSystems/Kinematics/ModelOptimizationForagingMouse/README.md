@@ -2,7 +2,11 @@
 
 The code for this repo can be found [here](https://github.com/bonsai-rx/machinelearning-examples/tree/main/examples/LinearDynamicalSystems/Kinematics/ModelOptimizationForagingMouse).
 
-In the following example, you can see how the parameters of the Kalman Filter can be automatically optimized to infer the kinematics of a mouse behaving in a foraging arena. This example is an extension to the [Foraging Mouse example](https://github.com/bonsai-rx/machinelearning-examples/tree/main/examples/LinearDynamicalSystems/Kinematics/ForagingMouse) in which the parameters of the model are optimized by learning the parameters of the model over small batches of training data. 
+In the following example, you can see how the parameters of the Kalman Filter can be automatically optimized to infer the kinematics of a mouse behaving in a foraging arena. This example is an extension to the [Foraging Mouse example](https://github.com/bonsai-rx/machinelearning-examples/tree/main/examples/LinearDynamicalSystems/Kinematics/ForagingMouse) in which the parameters of the model are optimized by learning the parameters of the model over small batches of training data.
+
+### Instructions
+
+Ensure you have Bonsai 2.9 installed on your system. You will also need to have the [uv Python environment manager](https://docs.astral.sh/uv/) installed. You can bootstrap the Python environment by running `uv sync` in the example directory.
 
 ### Dependencies
 
