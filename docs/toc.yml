@@ -36,6 +36,8 @@
   href: ../examples/Torch/LinearRegression/README.md
 
 - name: Torch Models
+- name: Custom PyTorch Model
+  href: ../examples/Torch/CustomPyTorchModel/README.md
 - name: Pretrained Neural Network for Image Classification
   href: ../examples/Torch/NeuralNetsPretrainedModel/README.md
 - name: Downloading and Running a TorchHub Model
