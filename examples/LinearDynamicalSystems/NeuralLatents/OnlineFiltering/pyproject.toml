@@ -1,0 +1,13 @@
+[project]
+name = "estimatingneurallatents"
+version = "0.1.0"
+description = "Example for estimating neural latents"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dandi>=0.71.4",
+    "h5py>=3.14.0",
+    "numpy>=2.3.3",
+    "pynwb>=3.1.2",
+    "remfile>=0.1.13",
+]
