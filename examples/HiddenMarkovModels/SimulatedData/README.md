@@ -4,6 +4,13 @@ The code for this repo can be found [here](https://github.com/bonsai-rx/machinel
 
 In the following example, you can see how the Hidden Markov Model (HMM) can be used to infer the underlying hidden state of a system producing observations from two distinct multivariate distributions.
 
+### Instructions
+
+Ensure you have Bonsai 2.9 installed on your system. You will also need to have the [uv Python environment manager](https://docs.astral.sh/uv/) installed.
+
+> [!NOTE]
+> The `ssm` package uses an old version of `setuptools` that is incompatible with modern package management tools. Because of this, you first need to create a new Python virtual environment using `uv venv`, install the required packages using `uv pip install -r requirements.txt`, and then synchronize the Python environment using `uv sync --no-build-isolation`. 
+
 ### Dependencies
 
 If you used the bootstrapping method, you don't have to worry about the package dependencies, as these should be already installed. However, if creating a new environment or integrating into an existing one, you will need to install the following packages:

@@ -4,6 +4,10 @@ The code for this repo can be found [here](https://github.com/bonsai-rx/machinel
 
 In the following example, you will see how the Kalman Filter can be used to perform Bayesian linear regression to estimate the parameters of a simple linear model with some added gaussian noise.
 
+### Instructions
+
+Ensure you have Bonsai 2.9 installed on your system. You will also need to have the [uv Python environment manager](https://docs.astral.sh/uv/) installed. You can bootstrap the Python environment by running `uv sync` in the example directory.
+
 ### Dependencies
 
 If you used the bootstrapping method, you dont have to worry about the package dependencies, as these should be already installed. However, if creating a new environment or integrating into an existing one, you will need to install the following packages:
