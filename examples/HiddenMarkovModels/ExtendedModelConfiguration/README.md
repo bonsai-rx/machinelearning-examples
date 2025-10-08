@@ -2,7 +2,7 @@
 
 The code for this repo can be found [here](https://github.com/bonsai-rx/machinelearning-examples/tree/main/examples/HiddenMarkovModels/ExtendedModelConfiguration).
 
-In the following example, you can see how to construct a Hidden Markov Model (HMM) with a custom configuration for the model's observation and transition distributions. This example extends the basic HMM configuration to allow for more complex scenarios, and includes 2 workflows, one for saving a custom model to disk and another for loading the model in a seperate workflow.
+In the following example, you can see how to construct a Hidden Markov Model (HMM) with a custom configuration for the model's observation and transition matrices. This example extends the basic HMM configuration to allow for more complex scenarios, and includes 2 workflows, one for saving a custom model to disk and another for loading the model in a separate workflow.
 
 ### Instructions
 
@@ -19,7 +19,7 @@ This example workflow demonstrates how to create an HMM with custom parameters. 
 ![Hidden Markov Models - Saving Custom Model To Disk](SaveModelConfig.bonsai)
 :::
 
-The default parameters when using the `CreateHMM` operator is a `Gaussian` observation model and `Stationary` transition model. However, these options don't allow for fine tuning the parameters of our model. To address this, the `CreateHMM` node allows us to fully parameterize the model's `StateParameters`, where we can fully specify the `Observations`, `Transitions`, and `InitialState` distributions, which will supersede the parameters set directly inside the `CreateHMM` operator.
+The default parameters when using the `CreateHMM` operator is a `Gaussian` observation model and `Stationary` transition model. However, these options don't allow for fine-grained specification of the parameters of our model. To address this, the `CreateHMM` node supports parameterizing the model's `StateParameters`. From here, we can specify the `Observations`, `Transitions`, and `InitialState` distributions, which will override the parameters set directly inside the `CreateHMM` operator.
 
 In this example, the `ConfigureHMM` group node encapsulates this functionality. The `ConfigureHMM` node contains externalized properties which allow us to fully specify the `Observations` and `Transitions` model. Here, we use `AutoRegressiveObservations`, and can specify the number of lags, etc. The `Transitions` model is set to `ConstrainedStationary`, which allows us to mask certain transitions from being used in the model.
 
