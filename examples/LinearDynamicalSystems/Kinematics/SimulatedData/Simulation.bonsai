@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WorkflowBuilder Version="2.8.1"
+<WorkflowBuilder Version="2.9.0"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
                  xmlns:py="clr-namespace:Bonsai.Scripting.Python;assembly=Bonsai.Scripting.Python"
@@ -9,7 +9,7 @@
                  xmlns:drw="clr-namespace:Bonsai.Vision.Drawing;assembly=Bonsai.Vision"
                  xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
                  xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
-                 xmlns:viz="clr-namespace:Bonsai.Design.Visualizers;assembly=Bonsai.Design.Visualizers"
+                 xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
@@ -577,18 +577,15 @@ def process(value):
         </Workflow>
       </Expression>
       <Expression xsi:type="VisualizerMapping" />
-      <Expression xsi:type="viz:TableLayoutPanelBuilder">
-        <viz:Name>SimulatedDataVisualizer</viz:Name>
-        <viz:ColumnCount>2</viz:ColumnCount>
-        <viz:RowCount>1</viz:RowCount>
-        <viz:ColumnStyles />
-        <viz:RowStyles>
-          <viz:RowStyle>
-            <viz:SizeType>Absolute</viz:SizeType>
-            <viz:Height>0</viz:Height>
-          </viz:RowStyle>
-        </viz:RowStyles>
-        <viz:CellSpans />
+      <Expression xsi:type="gui:TableLayoutPanelBuilder">
+        <gui:Name>SimulatedDataVisualizer</gui:Name>
+        <gui:Enabled>true</gui:Enabled>
+        <gui:Visible>true</gui:Visible>
+        <gui:ColumnCount>2</gui:ColumnCount>
+        <gui:RowCount>1</gui:RowCount>
+        <gui:ColumnStyles />
+        <gui:RowStyles />
+        <gui:CellSpans />
       </Expression>
     </Nodes>
     <Edges>
