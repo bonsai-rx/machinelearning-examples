@@ -28,6 +28,8 @@
   href: ../examples/HiddenMarkovModels/SimulatedData/README.md
 - name: Inferring Behavioral State from Kinematics
   href: ../examples/HiddenMarkovModels/InferringBehavioralStateFromKinematics/README.md
+- name: Extended Model Configuration
+  href: ../examples/HiddenMarkovModels/ExtendedModelConfiguration/README.md
 
 - name: Torch
 - name: Linear Regression
