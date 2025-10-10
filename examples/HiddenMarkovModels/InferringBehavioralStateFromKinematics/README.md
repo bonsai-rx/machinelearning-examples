@@ -27,7 +27,7 @@ If you used the bootstrapping method, you don't have to worry about the package 
 * Bonsai - Numerics v0.9.0
 
 > [!WARNING]
-> This example builds on the [LDS Kinematics Foraging Mouse example](../../LinearDynamicalSystems/Kinematics/ForagingMouse/README.md) and requires both the *Bonsai.ML.LinearDynamicalSystems* package and the *Bonsai.ML.HiddenMarkovModels* package. See the installation guide to ensure both packages are installed and working correctly.
+> This example builds on the [LDS Kinematics Foraging Mouse example](../../LinearDynamicalSystems/Kinematics/ForagingMouse/README.md) and requires both the *Bonsai.ML.Lds.Python* package and the *Bonsai.ML.Hmm.Python* package. See the installation guide to ensure both packages are installed and working correctly.
 
 ### Workflow
 
