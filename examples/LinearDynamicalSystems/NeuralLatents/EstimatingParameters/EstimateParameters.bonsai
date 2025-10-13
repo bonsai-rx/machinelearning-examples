@@ -17,7 +17,7 @@
           <Nodes>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="dsp:MatrixReader">
-                <dsp:Path>../../../../datasets/transformed_binned_spikes.bin</dsp:Path>
+                <dsp:Path>../../../../datasets/sub-Jenkins_ses-small_desc-train_behavior+ecephys.bin</dsp:Path>
                 <dsp:Offset>0</dsp:Offset>
                 <dsp:SampleRate>0</dsp:SampleRate>
                 <dsp:ChannelCount>142</dsp:ChannelCount>
