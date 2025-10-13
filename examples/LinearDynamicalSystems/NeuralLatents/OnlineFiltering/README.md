@@ -13,7 +13,15 @@ cd examples/Torch/NeuralLatents/OnlineFiltering
 uv run download_data.py
 ```
 
-When the script finishes, you should see a file called `transformed_binned_spikes.bin` inside the `datasets` folders.
+When the script finishes, you should see 2 different datasets saved, one for training and the other for testing.
+
+Next, run the python script to train the model on the training dataset and save the parameters of the model to disk.
+
+```bash
+uv run train_model.py
+```
+
+You can change the training procedure by passing parameters to the script. By default, this script will run 100 iterations, which can take several hours. You may want to consider changing this amount depending on your needs.
 
 ### Running the Workflow
 
@@ -23,7 +31,7 @@ The example workflow is shown here:
 ![Online Filtering of Neural Latents](OnlineFiltering.bonsai)
 :::
 
-The first group node, `LoadData`, loads the `datasets/transformed_binned_spikes.bin` file and produces a sequence of binned spike counts, one vector for each time point. Each spike count vector gets converted into a `Tensor` object. It then reshapes it into a column vector of `time` x `neurons` (in this case, time is `1`) and passes it to a `PublishSubject` called `SpikeCounts` to be used in the downstream processing pipeline.
+The first group node, `LoadData`, loads the testing dataset and produces a sequence of binned spike counts, one spike count vector for each time point. Each spike count vector gets converted into a `Tensor` object and then reshaped into a column vector of `time` x `neurons` (in this case, time is `1`). This data then feeds into a `PublishSubject` called `SpikeCounts` to be used in the downstream processing pipeline.
 
 The `LoadModel` group node uses the `CreateKalmanFilter` node to specify the model. We leave most of the optional parameters blank, but use `0.01` and `0.1` as our initial guesses of the `MeasurementNoiseVariance` and `ProcessNoiseVariance`, respectively. We set the `NumStates` to `10` and the `NumObservations` to `142` to match the number of spiking neurons contained in the dataset.
 
