@@ -13,7 +13,7 @@ cd examples/Torch.LDS/NeuralLatents/EstimatingParameters
 uv run download_data.py
 ```
 
-When the script finishes, you should see a file called `transformed_binned_spikes.bin` inside the `datasets` folders.
+When the script finishes, you should see 2 different datasets saved, one for training and the other for testing.
 
 ### Running the Workflow
 
@@ -23,7 +23,7 @@ The example workflow is shown here:
 ![Estimate Parameters](EstimateParameters.bonsai)
 :::
 
-The first group node, `LoadData`, loads the entire `datasets/transformed_binned_spikes.bin` file into memory and converts it into a `Tensor` object. It then reshapes it so that the dimensions are `time` x `neurons` and passes it to a `ReplaySubject` called `SpikeCounts` to be used in the downstream processing pipeline. In this example, the entire batch of data are loaded. 
+The first group node, `LoadData`, loads the training dataset and converts it into a `Tensor` object. It then reshapes it so that the dimensions are `time` x `neurons` and passes it to a `ReplaySubject` called `SpikeCounts` to be used in the downstream processing pipeline. In this example, the entire batch of data are loaded. 
 
 The `LoadModel` group node uses the `CreateKalmanFilter` node to specify the model. We leave the optional parameters blank. We set the `NumStates` to `10` and the `NumObservations` to `142` to match the number of spiking neurons contained in the dataset. This then feeds into a `BehaviorSubject` node called `KalmanFilterModel` for use in other parts of the workflow.
 
