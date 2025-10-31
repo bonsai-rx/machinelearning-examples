@@ -7,7 +7,6 @@
                  xmlns:p2="clr-namespace:Bonsai.ML.Lds.Torch;assembly=Bonsai.ML.Lds.Torch"
                  xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
-                 xmlns:p3="clr-namespace:Bonsai.ML.Lds.Torch.Design;assembly=Bonsai.ML.Lds.Torch.Design"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
@@ -65,55 +64,15 @@
         </Workflow>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>LoadModel</Name>
-        <Workflow>
-          <Nodes>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p2:CreateKalmanFilter">
-                <p2:Type>Float64</p2:Type>
-                <p2:NumStates>10</p2:NumStates>
-                <p2:NumObservations>142</p2:NumObservations>
-                <p2:TransitionMatrix />
-                <p2:MeasurementFunction />
-                <p2:ProcessNoiseVariance />
-                <p2:MeasurementNoiseVariance />
-                <p2:InitialMean />
-                <p2:InitialCovariance />
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>KalmanFilterModel</Name>
-            </Expression>
-            <Expression xsi:type="WorkflowOutput" />
-          </Nodes>
-          <Edges>
-            <Edge From="0" To="1" Label="Source1" />
-            <Edge From="1" To="2" Label="Source1" />
-          </Edges>
-        </Workflow>
-      </Expression>
-      <Expression xsi:type="GroupWorkflow">
         <Name>LearnParameters</Name>
         <Workflow>
           <Nodes>
             <Expression xsi:type="SubscribeSubject">
               <Name>SpikeCounts</Name>
             </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>KalmanFilterModel</Name>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Parameters</Selector>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="ModelParameters" />
-              </PropertyMappings>
-            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:ExpectationMaximization">
-                <p2:NumStates>2</p2:NumStates>
-                <p2:NumObservations>10</p2:NumObservations>
+                <p2:NumStates>10</p2:NumStates>
                 <p2:MaxIterations>10</p2:MaxIterations>
                 <p2:Tolerance>0.1</p2:Tolerance>
                 <p2:Verbose>true</p2:Verbose>
@@ -151,41 +110,34 @@
             <Expression xsi:type="MemberSelector">
               <Selector>Parameters</Selector>
             </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>KalmanFilterModel</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="Model" />
-              </PropertyMappings>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>KalmanFilterParameters</Name>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p2:UpdateKalmanFilterParameters" />
+              <Combinator xsi:type="p2:CreateKalmanFilter">
+                <p2:Type>Float64</p2:Type>
+                <p2:NumStates xsi:nil="true" />
+                <p2:NumObservations xsi:nil="true" />
+                <p2:TransitionMatrix />
+                <p2:MeasurementFunction />
+                <p2:ProcessNoiseVariance />
+                <p2:MeasurementNoiseVariance />
+                <p2:InitialMean />
+                <p2:InitialCovariance />
+              </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
-              <Name>ExpectationMaximizationResult</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
               <Name>KalmanFilterModel</Name>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:SubscribeWhen" />
             </Expression>
           </Nodes>
           <Edges>
-            <Edge From="0" To="4" Label="Source1" />
+            <Edge From="0" To="1" Label="Source1" />
             <Edge From="1" To="2" Label="Source1" />
             <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="4" Label="Source2" />
+            <Edge From="3" To="4" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
             <Edge From="5" To="6" Label="Source1" />
             <Edge From="6" To="7" Label="Source1" />
-            <Edge From="7" To="10" Label="Source1" />
-            <Edge From="8" To="9" Label="Source1" />
-            <Edge From="9" To="10" Label="Source2" />
-            <Edge From="10" To="11" Label="Source1" />
-            <Edge From="11" To="13" Label="Source1" />
-            <Edge From="12" To="13" Label="Source2" />
           </Edges>
         </Workflow>
       </Expression>
@@ -207,51 +159,11 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:Filter" />
             </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>UpdatedFilteredResult</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>ExpectationMaximizationResult</Name>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:SubscribeWhen" />
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>UpdatedFilteredResult</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>KalmanFilterModel</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="Model" />
-              </PropertyMappings>
-            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:Smooth" />
             </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>UpdatedSmoothedResult</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>UpdatedSmoothedResult</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>KalmanFilterModel</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="Model" />
-              </PropertyMappings>
-            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:Orthogonalize" />
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>OrthogonalizedResult</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>OrthogonalizedResult</Name>
             </Expression>
             <Expression xsi:type="rx:SelectMany">
               <Name>ReplayState</Name>
@@ -326,31 +238,30 @@
                 </Edges>
               </Workflow>
             </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>KalmanFilterModel</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:SubscribeWhen" />
+            </Expression>
             <Expression xsi:type="WorkflowOutput" />
           </Nodes>
           <Edges>
             <Edge From="0" To="3" Label="Source1" />
             <Edge From="1" To="2" Label="Source1" />
             <Edge From="2" To="3" Label="Source2" />
+            <Edge From="2" To="4" Label="Source2" />
+            <Edge From="2" To="5" Label="Source2" />
             <Edge From="3" To="4" Label="Source1" />
-            <Edge From="4" To="6" Label="Source1" />
-            <Edge From="5" To="6" Label="Source2" />
-            <Edge From="7" To="10" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="8" Label="Source1" />
+            <Edge From="7" To="8" Label="Source2" />
             <Edge From="8" To="9" Label="Source1" />
-            <Edge From="9" To="10" Label="Source2" />
-            <Edge From="10" To="11" Label="Source1" />
-            <Edge From="12" To="15" Label="Source1" />
-            <Edge From="13" To="14" Label="Source1" />
-            <Edge From="14" To="15" Label="Source2" />
-            <Edge From="15" To="16" Label="Source1" />
-            <Edge From="17" To="18" Label="Source1" />
-            <Edge From="18" To="19" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
       <Expression xsi:type="ui:VisualizerWindow">
-        <ui:VisualizerType xsi:type="TypeMapping" TypeArguments="p3:StateVisualizer" />
-        <ui:Text>NeuralLatents</ui:Text>
         <ui:Visible>true</ui:Visible>
         <ui:Location xsi:nil="true" />
         <ui:Size xsi:nil="true" />
@@ -358,7 +269,7 @@
       </Expression>
     </Nodes>
     <Edges>
-      <Edge From="3" To="4" Label="Source1" />
+      <Edge From="2" To="3" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
