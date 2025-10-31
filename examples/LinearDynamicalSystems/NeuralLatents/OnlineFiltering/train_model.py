@@ -2,6 +2,38 @@ import numpy as np
 import ssm.learning
 import os
 import argparse
+import leb128
+
+def convert_type(array):
+    match array.dtype:
+        case np.uint8:
+            return 0
+        case np.int8:
+            return 1
+        case np.int16:
+            return 2
+        case np.int32:
+            return 3
+        case np.int64:
+            return 4
+        case np.float16:
+            return 5
+        case np.float32:
+            return 6
+        case np.float64:
+            return 7
+        case np.bool_:
+            return 11
+        case _:
+            return 4711
+
+def save_to_tensor(array, filename):
+    with open(filename, "wb") as f:
+        f.write(leb128.u.encode(convert_type(array)))
+        f.write(leb128.u.encode(len(array.shape)))
+        for size in array.shape:
+            f.write(leb128.u.encode(size))
+        f.write(array.tobytes())
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -28,12 +60,14 @@ if __name__ == "__main__":
     vars_to_estimate = {var: (var in vars_to_estimate_list) for var in ["B", "Q", "Z", "R", "m0", "V0"]}
 
     if output_dir is None:
-        output_dir = os.path.join(os.path.realpath(os.path.dirname(__file__)), "..", "..", "..", "..", "datasets")
+        output_dir = os.path.join(os.path.realpath(os.path.dirname(__file__)), "..", "..", "..", "..", "datasets", "NeuralLatents")
+
+    os.makedirs(output_dir, exist_ok=True)
 
     print("Loading training data...")
 
     # load training data
-    training_data_file = os.path.join(output_dir, "sub-Jenkins_ses-small_desc-train_behavior+ecephys.bin")
+    training_data_file = os.path.join(os.path.dirname(output_dir), "sub-Jenkins_ses-small_desc-train_behavior+ecephys.bin")
 
     n_clusters = 142
     transformed_binned_spikes = np.fromfile(training_data_file, dtype=float).reshape(-1, n_clusters).T
@@ -59,11 +93,11 @@ if __name__ == "__main__":
     )
 
     # Save estimated parameters
-    optim_res["B"].astype(float).tofile(os.path.join(output_dir, "transition_matrix.bin"))
-    optim_res["Z"].astype(float).tofile(os.path.join(output_dir, "measurement_function.bin"))
-    optim_res["Q"].astype(float).tofile(os.path.join(output_dir, "process_noise_covariance.bin"))
-    optim_res["R"].astype(float).tofile(os.path.join(output_dir, "measurement_noise_covariance.bin"))
-    optim_res["m0"].astype(float).tofile(os.path.join(output_dir, "initial_state_mean.bin"))
-    optim_res["V0"].astype(float).tofile(os.path.join(output_dir, "initial_state_covariance.bin"))
+    save_to_tensor(optim_res["B"], os.path.join(output_dir, "TransitionMatrix.bin"))
+    save_to_tensor(optim_res["Z"], os.path.join(output_dir, "MeasurementFunction.bin"))
+    save_to_tensor(optim_res["Q"], os.path.join(output_dir, "ProcessNoiseCovariance.bin"))
+    save_to_tensor(optim_res["R"], os.path.join(output_dir, "MeasurementNoiseCovariance.bin"))
+    save_to_tensor(optim_res["m0"], os.path.join(output_dir, "InitialMean.bin"))
+    save_to_tensor(optim_res["V0"], os.path.join(output_dir, "InitialCovariance.bin"))
 
     print(f"Estimated parameters saved to {os.path.realpath(output_dir)}")
