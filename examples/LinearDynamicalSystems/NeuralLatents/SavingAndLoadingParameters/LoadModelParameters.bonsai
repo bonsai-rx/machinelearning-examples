@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WorkflowBuilder Version="2.9.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:dsp="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp"
+                 xmlns:p1="clr-namespace:Bonsai.ML.Torch;assembly=Bonsai.ML.Torch"
+                 xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
+                 xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:p2="clr-namespace:Bonsai.ML.Lds.Torch;assembly=Bonsai.ML.Lds.Torch"
+                 xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
+                 xmlns:p3="clr-namespace:Bonsai.ML.Lds.Torch.Design;assembly=Bonsai.ML.Lds.Torch.Design"
+                 xmlns="https://bonsai-rx.org/2018/workflow">
+  <Workflow>
+    <Nodes>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>LoadData</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="dsp:MatrixReader">
+                <dsp:Path>../../../../datasets/sub-Jenkins_ses-small_desc-test_ecephys.bin</dsp:Path>
+                <dsp:Offset>0</dsp:Offset>
+                <dsp:SampleRate>100</dsp:SampleRate>
+                <dsp:ChannelCount>142</dsp:ChannelCount>
+                <dsp:BufferLength>1</dsp:BufferLength>
+                <dsp:Depth>F64</dsp:Depth>
+                <dsp:Layout>ColumnMajor</dsp:Layout>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:ToTensor">
+                <p1:Type xsi:nil="true" />
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:Clone" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Expression>it.squeeze(null).unsqueeze(0)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>SpikeCounts</Name>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>LoadModel</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:LoadKalmanFilterParameters">
+                <p2:TransitionMatrixFilePath>transition_matrix.bin</p2:TransitionMatrixFilePath>
+                <p2:MeasurementFunctionFilePath>measurement_function.bin</p2:MeasurementFunctionFilePath>
+                <p2:ProcessNoiseCovarianceFilePath>process_noise_covariance.bin</p2:ProcessNoiseCovarianceFilePath>
+                <p2:MeasurementNoiseCovarianceFilePath>measurement_noise_covariance.bin</p2:MeasurementNoiseCovarianceFilePath>
+                <p2:InitialMeanFilePath>initial_mean.bin</p2:InitialMeanFilePath>
+                <p2:InitialCovarianceFilePath>initial_covariance.bin</p2:InitialCovarianceFilePath>
+                <p2:Type>Float32</p2:Type>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:CreateKalmanFilter">
+                <p2:Name>KalmanFilter</p2:Name>
+                <p2:Type>Float64</p2:Type>
+                <p2:NumStates>10</p2:NumStates>
+                <p2:NumObservations>142</p2:NumObservations>
+                <p2:TransitionMatrix />
+                <p2:MeasurementFunction />
+                <p2:ProcessNoiseVariance />
+                <p2:MeasurementNoiseVariance />
+                <p2:InitialMean />
+                <p2:InitialCovariance />
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>InferNeuralLatents</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SpikeCounts</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Filter">
+                <p2:ModelName>KalmanFilter</p2:ModelName>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Orthogonalize">
+                <p2:ModelName>KalmanFilter</p2:ModelName>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="ui:VisualizerWindow">
+        <ui:VisualizerType xsi:type="TypeMapping" TypeArguments="p3:StateVisualizer" />
+        <ui:Text>NeuralLatents</ui:Text>
+        <ui:Visible>true</ui:Visible>
+        <ui:Location xsi:nil="true" />
+        <ui:Size xsi:nil="true" />
+        <ui:WindowState xsi:nil="true" />
+      </Expression>
+    </Nodes>
+    <Edges>
+      <Edge From="2" To="3" Label="Source1" />
+    </Edges>
+  </Workflow>
+</WorkflowBuilder>
