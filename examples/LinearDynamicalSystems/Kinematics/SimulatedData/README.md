@@ -8,23 +8,6 @@ In the following example, you can find how the Kalman Filter can be used for kin
 
 Ensure you have Bonsai 2.9 installed on your system. You will also need to have the [uv Python environment manager](https://docs.astral.sh/uv/) installed. You can bootstrap the Python environment by running `uv sync` in the example directory.
 
-### Dependencies
-
-If you used the bootstrapping method, you dont have to worry about the package dependencies, as these should be already installed. However, if creating a new environment or integrating into an existing one, you will need to install the following packages:
-
-* Bonsai - Core v2.8.1
-* Bonsai - Design v2.8.0
-* Bonsai - Editor v2.8.0
-* Bonsai - ML v0.1.0
-* Bonsai - ML LinearDynamicalSystems v0.1.0
-* Bonsai - ML Visualizers v0.1.0
-* Bonsai - Numerics v0.9.0
-* Bonsai - Scripting v2.8.0
-* Bonsai - Scripting Python v0.2.0
-* Bonsai - System v2.8.0
-* Bonsai - Vision v2.8.1
-* Bonsai - Vision Design v2.8.0
-
 ### Workflow
 
 Below is the workflow for running the Kalman Filter Kinematics model on simulated data.

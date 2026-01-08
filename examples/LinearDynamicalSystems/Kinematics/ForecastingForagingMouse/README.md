@@ -8,21 +8,6 @@ In the following example, you can see how the Kalman Filter can be use to foreca
 
 Ensure you have Bonsai 2.9 installed on your system. You will also need to have the [uv Python environment manager](https://docs.astral.sh/uv/) installed. You can bootstrap the Python environment by running `uv sync` in the example directory.
 
-### Dependencies
-
-If you used the environment bootstrapping method, you dont have to worry about the package dependencies, as these should be already installed. However, if creating a new environment or integrating into an existing one, you will need to install the following packages:
-
-* Bonsai - Core v2.8.1
-* Bonsai - Design v2.8.0
-* Bonsai - Editor v2.8.0
-* Bonsai - ML v0.2.0
-* Bonsai - ML LinearDynamicalSystems v0.2.0
-* Bonsai - ML Visualizers v0.2.0
-* Bonsai - Scripting v2.8.0
-* Bonsai - Scripting Python v0.2.0
-* Bonsai - Vision v2.8.1
-* Bonsai - Vision Design v2.8.1
-
 ### Dataset
 
 The video for this example was generously provided by the Sainsbury Wellcome Centre Foraging Behaviour Working Group. (2023). Aeon: An open-source platform to study the neural basis of ethological behaviours over naturalistic timescales, [https://doi.org/10.5281/zenodo.8413142](https://doi.org/10.5281/zenodo.8413142)

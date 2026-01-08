@@ -9,7 +9,7 @@ In the following example, you can see how to construct a Hidden Markov Model (HM
 Ensure you have Bonsai 2.9 installed on your system. You will also need to have the [uv Python environment manager](https://docs.astral.sh/uv/) installed.
 
 > [!NOTE]
-> The `ssm` package uses an old version of `setuptools` that is incompatible with modern package management tools. Because of this, you first need to create a new Python virtual environment using `uv venv`, install the required packages using `uv pip install -r requirements.txt`, and then synchronize the Python environment using `uv sync --no-build-isolation`. 
+> The `ssm` package uses an old version of `setuptools` that is incompatible with modern package management tools. Because of this, you first need to create a new Python virtual environment using `uv venv`, install the required packages using `uv pip install -r requirements.txt`, and then synchronize the Python environment using `uv sync --no-build-isolation`.
 
 ### Save a Custom HMM Configuration
 
@@ -27,7 +27,7 @@ When the workflow is run, the output of the `ConfigureHMM` node is a custom HMM 
 
 ### Load a Custom HMM Configuration
 
-This example workflow demonstrates how to load the custom HMM model saved in the previous workflow. 
+This example workflow demonstrates how to load the custom HMM model saved in the previous workflow.
 
 :::workflow
 ![Hidden Markov Models - Loading Custom Model From Disk](LoadModelConfig.bonsai)

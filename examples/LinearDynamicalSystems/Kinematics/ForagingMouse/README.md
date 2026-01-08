@@ -8,21 +8,6 @@ In the following example, you can find how the Kalman Filter can be used to infe
 
 Ensure you have Bonsai 2.9 installed on your system. You will also need to have the [uv Python environment manager](https://docs.astral.sh/uv/) installed. You can bootstrap the Python environment by running `uv sync` in the example directory.
 
-### Dependencies
-
-If you used the bootstrapping method, you dont have to worry about the package dependencies, as these should be already installed. However, if creating a new environment or integrating into an existing one, you will need to install the following packages:
-
-* Bonsai - Core v2.8.1
-* Bonsai - Design v2.8.0
-* Bonsai - Editor v2.8.0
-* Bonsai - ML v0.1.0
-* Bonsai - ML LinearDynamicalSystems v0.1.0
-* Bonsai - ML Visualizers v0.1.0
-* Bonsai - Scripting v2.8.0
-* Bonsai - Scripting Python v0.2.0
-* Bonsai - Vision v2.8.1
-* Bonsai - Vision Design v2.8.1
-
 ### Dataset
 
 The video for this example was generously provided by the Sainsbury Wellcome Centre Foraging Behaviour Working Group. (2023). Aeon: An open-source platform to study the neural basis of ethological behaviours over naturalistic timescales, [https://doi.org/10.5281/zenodo.8413142](https://doi.org/10.5281/zenodo.8413142)
@@ -37,7 +22,7 @@ Below is the workflow for inferring kinematics of a mouse during a foraging task
 ![Kinematics - Mouse Foraging Behaviour](ForagingMouse.bonsai)
 :::
 
-In this example, a Kalman Filter is used to infer the position, velocity, and acceleration of the freely moving mouse. The frames per second of the video is 50 Hz, so we set the `Fps` property of the `CreateKFModel` node to 50. The workflow performs centroid tracking inside of the `MouseTracking` group node, which uses a standard image analysis pipeline to extract the `Centroid` of the animal. The `Centroid` data is then converted into a type of `Observation2D` that the model then uses to perform inference using the  `PerformInference` node.
+In this example, a Kalman Filter is used to infer the position, velocity, and acceleration of the freely moving mouse. The frames per second of the video is 50 Hz, so we set the `Fps` property of the `CreateKFModel` node to 50. The workflow performs centroid tracking inside of the `MouseTracking` group node, which uses a standard image analysis pipeline to extract the `Centroid` of the animal. The `Centroid` data is then converted into a type of `Observation2D` that the model then uses to perform inference using the `PerformInference` node.
 
 Since the tracking pipeline takes some time to initialize, we wait to create the kalman filter using the `SubscribeWhen` node only once `TrackingStarted` has produced a value, which is conditioned on centroid != NaN.
 
