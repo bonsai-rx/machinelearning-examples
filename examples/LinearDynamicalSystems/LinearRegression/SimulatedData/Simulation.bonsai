@@ -15,7 +15,7 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="py:GetRuntime" />
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.LinearDynamicalSystems:LoadLDSModule.bonsai" />
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Lds.Python:LoadLDSModule.bonsai" />
       <Expression xsi:type="GroupWorkflow">
         <Name>SyntheticDataset</Name>
         <Workflow>
@@ -237,7 +237,7 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="py:GetRuntime" />
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.LinearDynamicalSystems:LinearRegression.CreateKFModel.bonsai">
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Lds.Python:LinearRegression.CreateKFModel.bonsai">
         <LikelihoodPrecisionCoefficient>25</LikelihoodPrecisionCoefficient>
         <PriorPrecisionCoefficient>2</PriorPrecisionCoefficient>
         <NumFeatures>2</NumFeatures>
@@ -255,10 +255,10 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="rx:SubscribeWhen" />
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.LinearDynamicalSystems:LinearRegression.PerformInference.bonsai">
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Lds.Python:LinearRegression.PerformInference.bonsai">
         <Name>model</Name>
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.LinearDynamicalSystems:LinearRegression.CreateMultivariatePDF.bonsai">
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Lds.Python:LinearRegression.CreateMultivariatePDF.bonsai">
         <Name>model</Name>
         <X0>-1</X0>
         <X1>1</X1>

@@ -2,9 +2,9 @@
 <WorkflowBuilder Version="2.9.0"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xmlns:py="clr-namespace:Bonsai.Scripting.Python;assembly=Bonsai.Scripting.Python"
-                 xmlns:p1="clr-namespace:Bonsai.ML.HiddenMarkovModels.Observations;assembly=Bonsai.ML.HiddenMarkovModels"
-                 xmlns:p2="clr-namespace:Bonsai.ML.HiddenMarkovModels.Transitions;assembly=Bonsai.ML.HiddenMarkovModels"
-                 xmlns:p3="clr-namespace:Bonsai.ML.HiddenMarkovModels;assembly=Bonsai.ML.HiddenMarkovModels"
+                 xmlns:p1="clr-namespace:Bonsai.ML.Hmm.Python.Observations;assembly=Bonsai.ML.Hmm.Python"
+                 xmlns:p2="clr-namespace:Bonsai.ML.Hmm.Python.Transitions;assembly=Bonsai.ML.Hmm.Python"
+                 xmlns:p3="clr-namespace:Bonsai.ML.Hmm.Python;assembly=Bonsai.ML.Hmm.Python"
                  xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
                  xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
                  xmlns="https://bonsai-rx.org/2018/workflow">
@@ -16,7 +16,7 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="py:GetRuntime" />
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:LoadHMMModule.bonsai" />
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Hmm.Python:LoadHMMModule.bonsai" />
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="py:GetRuntime" />
       </Expression>
@@ -64,7 +64,7 @@
               <Property Name="NumStates" />
               <Property Name="Dimensions" />
             </Expression>
-            <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:CreateHMM.bonsai">
+            <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Hmm.Python:CreateHMM.bonsai">
               <Name>hmm</Name>
               <NumStates>2</NumStates>
               <Dimensions>2</Dimensions>

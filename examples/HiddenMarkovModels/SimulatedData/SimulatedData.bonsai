@@ -18,11 +18,11 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="py:GetRuntime" />
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:LoadHMMModule.bonsai" />
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Hmm.Python:LoadHMMModule.bonsai" />
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="py:GetRuntime" />
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:CreateHMM.bonsai">
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Hmm.Python:CreateHMM.bonsai">
         <Name>hmm</Name>
         <NumStates>2</NumStates>
         <Dimensions>2</Dimensions>
@@ -292,7 +292,7 @@
       <Expression xsi:type="SubscribeSubject">
         <Name>Observation</Name>
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:RunFitAsync.bonsai">
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Hmm.Python:RunFitAsync.bonsai">
         <BatchSize>80</BatchSize>
         <Name>hmm</Name>
         <NumIterations>50</NumIterations>
@@ -301,7 +301,7 @@
         <TransitionParams>true</TransitionParams>
         <ObservationParams>true</ObservationParams>
       </Expression>
-      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:CheckFitFinished.bonsai">
+      <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Hmm.Python:CheckFitFinished.bonsai">
         <Name>hmm</Name>
         <TimerFrequency>PT1S</TimerFrequency>
       </Expression>
@@ -317,7 +317,7 @@
             <Expression xsi:type="SubscribeSubject">
               <Name>Observation</Name>
             </Expression>
-            <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.HiddenMarkovModels:InferState.bonsai">
+            <Expression xsi:type="IncludeWorkflow" Path="Bonsai.ML.Hmm.Python:InferState.bonsai">
               <Name>hmm</Name>
             </Expression>
             <Expression xsi:type="WorkflowOutput" />
