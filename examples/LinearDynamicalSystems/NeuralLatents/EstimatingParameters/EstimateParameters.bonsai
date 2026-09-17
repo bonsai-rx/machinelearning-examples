@@ -82,6 +82,8 @@
                 <p2:EstimateMeasurementNoiseCovariance>true</p2:EstimateMeasurementNoiseCovariance>
                 <p2:EstimateInitialMean>true</p2:EstimateInitialMean>
                 <p2:EstimateInitialCovariance>true</p2:EstimateInitialCovariance>
+                <p2:EstimateStateOffset>false</p2:EstimateStateOffset>
+                <p2:EstimateObservationOffset>false</p2:EstimateObservationOffset>
               </Combinator>
             </Expression>
             <Expression xsi:type="ui:VisualizerWindow">
@@ -125,6 +127,8 @@
                 <p2:MeasurementNoiseVariance />
                 <p2:InitialMean />
                 <p2:InitialCovariance />
+                <p2:StateOffset />
+                <p2:ObservationOffset />
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -177,7 +181,7 @@
                     <Selector>Mean</Selector>
                   </Expression>
                   <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="p1:Decompose">
+                    <Combinator xsi:type="p1:Unbind">
                       <p1:Dimension>0</p1:Dimension>
                     </Combinator>
                   </Expression>
@@ -188,7 +192,7 @@
                     <Selector>Covariance</Selector>
                   </Expression>
                   <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="p1:Decompose">
+                    <Combinator xsi:type="p1:Unbind">
                       <p1:Dimension>0</p1:Dimension>
                     </Combinator>
                   </Expression>

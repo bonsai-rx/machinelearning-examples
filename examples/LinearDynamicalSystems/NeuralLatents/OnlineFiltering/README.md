@@ -40,3 +40,7 @@ In the `LearnParameters` group node, the `SpikeCounts` are fed into `Buffer`, wh
 The last group node, `InferNeuralLatents`, contains the inference pipeline and starts when the `ExpectationMaximizationResult` is emitted. The `Filter` step runs causal filtering over each new data point it observes from the `SpikeCounts` subject. This output is fed into the `Orthogonalize` node, which extracts the principal components of the measurement function and projects the state mean and covariance into the orthogonalized space.
 
 When you start the workflow, a window will pop up with the title `NeuralLatents`. As the EM algorithm runs, nothing will be displayed at first. After some time (~1 min), the EM algorithm will finish, and you will start to see the filtered latents displayed in the chart.
+
+### Demo
+
+![](./OnlineFilteringNeuralLatents.gif)
