@@ -54,3 +54,8 @@
   href: ../examples/PointProcessDecoder/DecodePositionFromStriatumSortedUnits/README.md
 - name: Classify Dynamics and Decode Position from Hippocampal Sorted Units 
   href: ../examples/PointProcessDecoder/ClassifyPositionFromHippocampusSortedUnits/README.md
+
+- name: Principal Component Analysis (PCA)
+  items:
+    - name: Batch Fitting of PCA on MNIST Data
+      href: ../examples/PrincipalComponentAnalysis/BatchFit/README.md
