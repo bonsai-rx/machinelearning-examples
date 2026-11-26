@@ -61,3 +61,5 @@
       href: ../examples/PrincipalComponentAnalysis/BatchFit/README.md
     - name: Online Fitting of PCA on MNIST Data
       href: ../examples/PrincipalComponentAnalysis/StreamingOnline/README.md
+    - name: Tracking a Rotating Axis with Online PCA
+      href: ../examples/PrincipalComponentAnalysis/TrackingRotatingAxis/README.md
