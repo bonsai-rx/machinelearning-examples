@@ -1,0 +1,1386 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WorkflowBuilder Version="2.9.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:p1="clr-namespace:;assembly=Extensions"
+                 xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:p2="clr-namespace:Bonsai.ML.Torch.Random;assembly=Bonsai.ML.Torch"
+                 xmlns:p3="clr-namespace:Bonsai.ML.Pca.Torch;assembly=Bonsai.ML.Pca.Torch"
+                 xmlns:p4="clr-namespace:Bonsai.ML.Torch;assembly=Bonsai.ML.Torch"
+                 xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
+                 xmlns:zg="clr-namespace:Bonsai.Gui.ZedGraph;assembly=Bonsai.Gui.ZedGraph"
+                 xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
+                 xmlns="https://bonsai-rx.org/2018/workflow">
+  <Workflow>
+    <Nodes>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>LoadData</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:MnistLoader">
+                <p1:Path>../../../datasets/MNIST/raw</p1:Path>
+                <p1:Split>Train</p1:Split>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Images</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Concat" />
+            </Expression>
+            <Expression xsi:type="rx:ReplaySubject">
+              <Name>TrainImage</Name>
+              <rx:BufferSize xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Labels</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Concat" />
+            </Expression>
+            <Expression xsi:type="rx:ReplaySubject">
+              <Name>TrainLabel</Name>
+              <rx:BufferSize xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p1:MnistLoader">
+                <p1:Path>../../../datasets/MNIST/raw</p1:Path>
+                <p1:Split>Test</p1:Split>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Images</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Concat" />
+            </Expression>
+            <Expression xsi:type="rx:ReplaySubject">
+              <Name>TestImage</Name>
+              <rx:BufferSize xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Labels</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Concat" />
+            </Expression>
+            <Expression xsi:type="rx:ReplaySubject">
+              <Name>TestLabel</Name>
+              <rx:BufferSize xsi:nil="true" />
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="0" To="4" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="7" To="11" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>CreateModel</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:CreateGenerator">
+                <p2:Seed>0</p2:Seed>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Generator" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="p3:CreatePca">
+              <p3:Model xsi:type="p3:OnlinePcaGha">
+                <p3:NumComponents>2</p3:NumComponents>
+                <p3:Type>Float32</p3:Type>
+                <p3:LearningRate>0.1</p3:LearningRate>
+              </p3:Model>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>PcaModel</Name>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>Run</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>TestImage</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Fitting</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:TakeLast">
+                <rx:Count>1</rx:Count>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:SubscribeWhen" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p4:ToTensor">
+                <p4:Type xsi:nil="true" />
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p4:ConvertScalarType">
+                <p4:Type>Float32</p4:Type>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p4:View">
+                <p4:Dimensions>
+                  <p4:long>1</p4:long>
+                  <p4:long>-1</p4:long>
+                </p4:Dimensions>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>PcaModel</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:WithLatestFrom" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p3:Transform" />
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>LabelData</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p4:Index">
+                      <p4:Value>:,0</p4:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="p4:ConvertToArray">
+                    <p4:Type>Float32</p4:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p4:Index">
+                      <p4:Value>:,1</p4:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="p4:ConvertToArray">
+                    <p4:Type>Float32</p4:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>TestLabel</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new (Item1 as X, Item2 as Y, Item3 as Label)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="4" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="8" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="6" To="8" Label="Source2" />
+                  <Edge From="7" To="8" Label="Source3" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="10" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>Visualizer</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>9</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>9</zg:Label>
+                        <zg:Color>Orange</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>8</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>8</zg:Label>
+                        <zg:Color>Teal</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>7</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>7</zg:Label>
+                        <zg:Color>#804000</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>6</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>6</zg:Label>
+                        <zg:Color>Fuchsia</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>5</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>5</zg:Label>
+                        <zg:Color>#8080FF</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>4</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>4</zg:Label>
+                        <zg:Color>Blue</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>3</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>3</zg:Label>
+                        <zg:Color>Yellow</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>2</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>2</zg:Label>
+                        <zg:Color>Lime</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>1</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>1</zg:Label>
+                        <zg:Color>OrangeRed</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>0</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>0</zg:Label>
+                        <zg:Color>Red</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="zg:GraphPanelBuilder">
+                    <zg:ReverseX>false</zg:ReverseX>
+                    <zg:ReverseY>false</zg:ReverseY>
+                    <zg:Span xsi:nil="true" />
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="4" Label="Source1" />
+                  <Edge From="0" To="7" Label="Source1" />
+                  <Edge From="0" To="10" Label="Source1" />
+                  <Edge From="0" To="13" Label="Source1" />
+                  <Edge From="0" To="16" Label="Source1" />
+                  <Edge From="0" To="19" Label="Source1" />
+                  <Edge From="0" To="22" Label="Source1" />
+                  <Edge From="0" To="25" Label="Source1" />
+                  <Edge From="0" To="28" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="31" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="6" To="31" Label="Source2" />
+                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="31" Label="Source3" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="12" Label="Source1" />
+                  <Edge From="12" To="31" Label="Source4" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source1" />
+                  <Edge From="15" To="31" Label="Source5" />
+                  <Edge From="16" To="17" Label="Source1" />
+                  <Edge From="17" To="18" Label="Source1" />
+                  <Edge From="18" To="31" Label="Source6" />
+                  <Edge From="19" To="20" Label="Source1" />
+                  <Edge From="20" To="21" Label="Source1" />
+                  <Edge From="21" To="31" Label="Source7" />
+                  <Edge From="22" To="23" Label="Source1" />
+                  <Edge From="23" To="24" Label="Source1" />
+                  <Edge From="24" To="31" Label="Source8" />
+                  <Edge From="25" To="26" Label="Source1" />
+                  <Edge From="26" To="27" Label="Source1" />
+                  <Edge From="27" To="31" Label="Source9" />
+                  <Edge From="28" To="29" Label="Source1" />
+                  <Edge From="29" To="30" Label="Source1" />
+                  <Edge From="30" To="31" Label="Source10" />
+                  <Edge From="31" To="32" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>Test</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location xsi:nil="true" />
+              <ui:Size xsi:nil="true" />
+              <ui:WindowState xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>TrainImage</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p4:ToTensor">
+                <p4:Type xsi:nil="true" />
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p4:ConvertScalarType">
+                <p4:Type>Float32</p4:Type>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p4:View">
+                <p4:Dimensions>
+                  <p4:long>1</p4:long>
+                  <p4:long>-1</p4:long>
+                </p4:Dimensions>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>PcaModel</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:WithLatestFrom" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p3:FitAndTransform" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>Fitting</Name>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>LabelData</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p4:Index">
+                      <p4:Value>:,0</p4:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="p4:ConvertToArray">
+                    <p4:Type>Float32</p4:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p4:Index">
+                      <p4:Value>:,1</p4:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="p4:ConvertToArray">
+                    <p4:Type>Float32</p4:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>TrainLabel</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new (Item1 as X, Item2 as Y, Item3 as Label)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="4" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="8" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="6" To="8" Label="Source2" />
+                  <Edge From="7" To="8" Label="Source3" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="10" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>Visualizer</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>9</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>9</zg:Label>
+                        <zg:Color>Orange</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>8</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>8</zg:Label>
+                        <zg:Color>Teal</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>7</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>7</zg:Label>
+                        <zg:Color>#804000</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>6</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>6</zg:Label>
+                        <zg:Color>Fuchsia</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>5</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>5</zg:Label>
+                        <zg:Color>#8080FF</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>4</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>4</zg:Label>
+                        <zg:Color>Blue</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>3</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>3</zg:Label>
+                        <zg:Color>Yellow</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>2</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>2</zg:Label>
+                        <zg:Color>Lime</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>1</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>1</zg:Label>
+                        <zg:Color>OrangeRed</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Label</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>0</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:IndexSelector />
+                    <zg:ValueSelector />
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>0</zg:LineWidth>
+                    <zg:CurveSettings>
+                      <zg:CurveConfiguration>
+                        <zg:Label>0</zg:Label>
+                        <zg:Color>Red</zg:Color>
+                      </zg:CurveConfiguration>
+                    </zg:CurveSettings>
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="zg:GraphPanelBuilder">
+                    <zg:ReverseX>false</zg:ReverseX>
+                    <zg:ReverseY>false</zg:ReverseY>
+                    <zg:Span xsi:nil="true" />
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin xsi:nil="true" />
+                    <zg:YMax xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="4" Label="Source1" />
+                  <Edge From="0" To="7" Label="Source1" />
+                  <Edge From="0" To="10" Label="Source1" />
+                  <Edge From="0" To="13" Label="Source1" />
+                  <Edge From="0" To="16" Label="Source1" />
+                  <Edge From="0" To="19" Label="Source1" />
+                  <Edge From="0" To="22" Label="Source1" />
+                  <Edge From="0" To="25" Label="Source1" />
+                  <Edge From="0" To="28" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="31" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="6" To="31" Label="Source2" />
+                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="31" Label="Source3" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="12" Label="Source1" />
+                  <Edge From="12" To="31" Label="Source4" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source1" />
+                  <Edge From="15" To="31" Label="Source5" />
+                  <Edge From="16" To="17" Label="Source1" />
+                  <Edge From="17" To="18" Label="Source1" />
+                  <Edge From="18" To="31" Label="Source6" />
+                  <Edge From="19" To="20" Label="Source1" />
+                  <Edge From="20" To="21" Label="Source1" />
+                  <Edge From="21" To="31" Label="Source7" />
+                  <Edge From="22" To="23" Label="Source1" />
+                  <Edge From="23" To="24" Label="Source1" />
+                  <Edge From="24" To="31" Label="Source8" />
+                  <Edge From="25" To="26" Label="Source1" />
+                  <Edge From="26" To="27" Label="Source1" />
+                  <Edge From="27" To="31" Label="Source9" />
+                  <Edge From="28" To="29" Label="Source1" />
+                  <Edge From="29" To="30" Label="Source1" />
+                  <Edge From="30" To="31" Label="Source10" />
+                  <Edge From="31" To="32" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>FitModel</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location xsi:nil="true" />
+              <ui:Size xsi:nil="true" />
+              <ui:WindowState xsi:nil="true" />
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="3" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source2" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="8" Label="Source1" />
+            <Edge From="7" To="8" Label="Source2" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="13" To="14" Label="Source1" />
+            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="15" To="16" Label="Source1" />
+            <Edge From="16" To="18" Label="Source1" />
+            <Edge From="17" To="18" Label="Source2" />
+            <Edge From="18" To="19" Label="Source1" />
+            <Edge From="19" To="20" Label="Source1" />
+            <Edge From="20" To="21" Label="Source1" />
+            <Edge From="21" To="22" Label="Source1" />
+            <Edge From="22" To="23" Label="Source1" />
+            <Edge From="23" To="24" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+    </Nodes>
+    <Edges />
+  </Workflow>
+</WorkflowBuilder>

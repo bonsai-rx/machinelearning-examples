@@ -1,0 +1,767 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WorkflowBuilder Version="2.9.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:p1="clr-namespace:Bonsai.ML.Torch.Random;assembly=Bonsai.ML.Torch"
+                 xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:dsp="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp"
+                 xmlns:p2="clr-namespace:Bonsai.ML.Torch;assembly=Bonsai.ML.Torch"
+                 xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
+                 xmlns:p3="clr-namespace:Bonsai.ML.Pca.Torch;assembly=Bonsai.ML.Pca.Torch"
+                 xmlns:zg="clr-namespace:Bonsai.Gui.ZedGraph;assembly=Bonsai.Gui.ZedGraph"
+                 xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
+                 xmlns="https://bonsai-rx.org/2018/workflow">
+  <Workflow>
+    <Nodes>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="p1:ManualSeed">
+          <p1:Seed>0</p1:Seed>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="rx:BehaviorSubject">
+        <Name>Generator</Name>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>LoadData</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="dsp:MatrixReader">
+                <dsp:Path>../../../datasets/StriatalNeuropixelRecordings/spike_counts.bin</dsp:Path>
+                <dsp:Offset>0</dsp:Offset>
+                <dsp:SampleRate>600</dsp:SampleRate>
+                <dsp:ChannelCount>564</dsp:ChannelCount>
+                <dsp:BufferLength>12</dsp:BufferLength>
+                <dsp:Depth>F64</dsp:Depth>
+                <dsp:Layout>ColumnMajor</dsp:Layout>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:ToTensor">
+                <p2:Type xsi:nil="true" />
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Sum">
+                <p2:Dimensions>
+                  <p2:long>1</p2:long>
+                </p2:Dimensions>
+                <p2:KeepDimensions>false</p2:KeepDimensions>
+                <p2:Type xsi:nil="true" />
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:View">
+                <p2:Dimensions>
+                  <p2:long>1</p2:long>
+                  <p2:long>-1</p2:long>
+                </p2:Dimensions>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:ConvertScalarType">
+                <p2:Type>Float32</p2:Type>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:CreateTensor">
+                <p2:Type>Float32</p2:Type>
+                <p2:Values>0.5</p2:Values>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:WithLatestFrom" />
+            </Expression>
+            <Expression xsi:type="Add" />
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Expression>it.sqrt()</scr:Expression>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:BufferCount">
+                <rx:Count>5</rx:Count>
+                <rx:Skip>5</rx:Skip>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Concat">
+                <p2:Dimension>0</p2:Dimension>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>SpikeCounts</Name>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="6" Label="Source1" />
+            <Edge From="5" To="6" Label="Source2" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>CreateModels</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Generator</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Generator" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="p3:CreatePca">
+              <p3:Model xsi:type="p3:OnlineProbabilisticPca">
+                <p3:NumComponents>3</p3:NumComponents>
+                <p3:Type>Float32</p3:Type>
+                <p3:Rho>0.01</p3:Rho>
+                <p3:Kappa xsi:nil="true" />
+                <p3:InitialVariance>1</p3:InitialVariance>
+                <p3:ReorthogonalizePeriod>10</p3:ReorthogonalizePeriod>
+                <p3:SampleOffset xsi:nil="true" />
+              </p3:Model>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>ProbabilisticModel</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Generator</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Generator" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="p3:CreatePca">
+              <p3:Model xsi:type="p3:OnlinePcaGha">
+                <p3:NumComponents>3</p3:NumComponents>
+                <p3:Type>Float32</p3:Type>
+                <p3:LearningRate>0.1</p3:LearningRate>
+              </p3:Model>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>GhaModel</Name>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>FitProbabilistic</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SpikeCounts</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>ProbabilisticModel</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:WithLatestFrom" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p3:FitAndTransform" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>ProbabilisticLatents</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2.Mean</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Index">
+                <p2:Value>288</p2:Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>ProbabilisticMean</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2.Variance</Selector>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>NoiseVariance</Name>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="2" Label="Source1" />
+            <Edge From="1" To="2" Label="Source2" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="3" To="6" Label="Source1" />
+            <Edge From="3" To="9" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>FitGha</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SpikeCounts</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>GhaModel</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:WithLatestFrom" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p3:FitAndTransform" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>GhaLatents</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2.Mean</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Index">
+                <p2:Value>0,288</p2:Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>GhaMean</Name>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="2" Label="Source1" />
+            <Edge From="1" To="2" Label="Source2" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="3" To="6" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>UnitActivity</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SpikeCounts</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Index">
+                <p2:Value>:,288</p2:Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:Mean">
+                <p2:Dimensions>
+                  <p2:long>0</p2:long>
+                </p2:Dimensions>
+                <p2:KeepDimensions>false</p2:KeepDimensions>
+                <p2:Type xsi:nil="true" />
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>UnitActivity</Name>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>VisualizeLatents</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>ProbabilisticLatents</Name>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ToSeries</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p2:Index">
+                      <p2:Value>:,0</p2:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="p2:ConvertToArray">
+                    <p2:Type>Float32</p2:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:ElementIndex" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new (Index as X, Value as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="zg:LineGraphBuilder">
+              <zg:IndexSelector />
+              <zg:ValueSelector />
+              <zg:SymbolType>None</zg:SymbolType>
+              <zg:LineWidth>1</zg:LineWidth>
+              <zg:CurveSettings>
+                <zg:CurveConfiguration>
+                  <zg:Label>Latent 1</zg:Label>
+                  <zg:Color>Blue</zg:Color>
+                </zg:CurveConfiguration>
+              </zg:CurveSettings>
+              <zg:Capacity>3000</zg:Capacity>
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>ProbabilisticLatents</Name>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ToSeries</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p2:Index">
+                      <p2:Value>:,1</p2:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="p2:ConvertToArray">
+                    <p2:Type>Float32</p2:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:ElementIndex" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new (Index as X, Value as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="zg:LineGraphBuilder">
+              <zg:IndexSelector />
+              <zg:ValueSelector />
+              <zg:SymbolType>None</zg:SymbolType>
+              <zg:LineWidth>1</zg:LineWidth>
+              <zg:CurveSettings>
+                <zg:CurveConfiguration>
+                  <zg:Label>Latent 2</zg:Label>
+                  <zg:Color>Orange</zg:Color>
+                </zg:CurveConfiguration>
+              </zg:CurveSettings>
+              <zg:Capacity>3000</zg:Capacity>
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>ProbabilisticLatents</Name>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ToSeries</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p2:Index">
+                      <p2:Value>:,2</p2:Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="p2:ConvertToArray">
+                    <p2:Type>Float32</p2:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:ElementIndex" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new (Index as X, Value as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="zg:LineGraphBuilder">
+              <zg:IndexSelector />
+              <zg:ValueSelector />
+              <zg:SymbolType>None</zg:SymbolType>
+              <zg:LineWidth>1</zg:LineWidth>
+              <zg:CurveSettings>
+                <zg:CurveConfiguration>
+                  <zg:Label>Latent 3</zg:Label>
+                  <zg:Color>Green</zg:Color>
+                </zg:CurveConfiguration>
+              </zg:CurveSettings>
+              <zg:Capacity>3000</zg:Capacity>
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="zg:GraphPanelBuilder">
+              <zg:ReverseX>false</zg:ReverseX>
+              <zg:ReverseY>false</zg:ReverseY>
+              <zg:Span xsi:nil="true" />
+              <zg:Capacity xsi:nil="true" />
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="12" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="12" Label="Source2" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="12" Label="Source3" />
+            <Edge From="12" To="13" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="ui:VisualizerWindow">
+        <ui:Text>Latents</ui:Text>
+        <ui:Visible>true</ui:Visible>
+        <ui:Location xsi:nil="true" />
+        <ui:Size xsi:nil="true" />
+        <ui:WindowState xsi:nil="true" />
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>VisualizeBaseline</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>UnitActivity</Name>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ToSeries</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="p2:ConvertToArray">
+                    <p2:Type>Float32</p2:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:ElementIndex" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new (Index as X, Value as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="zg:LineGraphBuilder">
+              <zg:IndexSelector />
+              <zg:ValueSelector />
+              <zg:SymbolType>None</zg:SymbolType>
+              <zg:LineWidth>1</zg:LineWidth>
+              <zg:CurveSettings>
+                <zg:CurveConfiguration>
+                  <zg:Label>Unit 288</zg:Label>
+                  <zg:Color>LightGrey</zg:Color>
+                </zg:CurveConfiguration>
+              </zg:CurveSettings>
+              <zg:Capacity xsi:nil="true" />
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>ProbabilisticMean</Name>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ToSeries</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="p2:ConvertToArray">
+                    <p2:Type>Float32</p2:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:ElementIndex" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new (Index as X, Value as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="zg:LineGraphBuilder">
+              <zg:IndexSelector />
+              <zg:ValueSelector />
+              <zg:SymbolType>None</zg:SymbolType>
+              <zg:LineWidth>2</zg:LineWidth>
+              <zg:CurveSettings>
+                <zg:CurveConfiguration>
+                  <zg:Label>OnlineProbabilisticPca mean</zg:Label>
+                  <zg:Color>Blue</zg:Color>
+                </zg:CurveConfiguration>
+              </zg:CurveSettings>
+              <zg:Capacity xsi:nil="true" />
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>GhaMean</Name>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ToSeries</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="p2:ConvertToArray">
+                    <p2:Type>Float32</p2:Type>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:ElementIndex" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new (Index as X, Value as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="zg:LineGraphBuilder">
+              <zg:IndexSelector />
+              <zg:ValueSelector />
+              <zg:SymbolType>None</zg:SymbolType>
+              <zg:LineWidth>2</zg:LineWidth>
+              <zg:CurveSettings>
+                <zg:CurveConfiguration>
+                  <zg:Label>OnlinePcaGha mean</zg:Label>
+                  <zg:Color>Red</zg:Color>
+                </zg:CurveConfiguration>
+              </zg:CurveSettings>
+              <zg:Capacity xsi:nil="true" />
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="zg:GraphPanelBuilder">
+              <zg:ReverseX>false</zg:ReverseX>
+              <zg:ReverseY>false</zg:ReverseY>
+              <zg:Span xsi:nil="true" />
+              <zg:Capacity xsi:nil="true" />
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="12" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="12" Label="Source2" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="12" Label="Source3" />
+            <Edge From="12" To="13" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="ui:VisualizerWindow">
+        <ui:Text>Baseline of unit 288</ui:Text>
+        <ui:Visible>true</ui:Visible>
+        <ui:Location xsi:nil="true" />
+        <ui:Size xsi:nil="true" />
+        <ui:WindowState xsi:nil="true" />
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>VisualizeNoiseVariance</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>NoiseVariance</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:ElementIndex" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Expression>new (Index as X, Value as Y)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="zg:LineGraphBuilder">
+              <zg:IndexSelector />
+              <zg:ValueSelector />
+              <zg:SymbolType>None</zg:SymbolType>
+              <zg:LineWidth>1</zg:LineWidth>
+              <zg:CurveSettings>
+                <zg:CurveConfiguration>
+                  <zg:Label>Noise variance</zg:Label>
+                  <zg:Color>Blue</zg:Color>
+                </zg:CurveConfiguration>
+              </zg:CurveSettings>
+              <zg:Capacity xsi:nil="true" />
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="zg:GraphPanelBuilder">
+              <zg:ReverseX>false</zg:ReverseX>
+              <zg:ReverseY>false</zg:ReverseY>
+              <zg:Span xsi:nil="true" />
+              <zg:Capacity xsi:nil="true" />
+              <zg:XMin xsi:nil="true" />
+              <zg:XMax xsi:nil="true" />
+              <zg:YMin xsi:nil="true" />
+              <zg:YMax xsi:nil="true" />
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="ui:VisualizerWindow">
+        <ui:Text>Noise variance</ui:Text>
+        <ui:Visible>true</ui:Visible>
+        <ui:Location xsi:nil="true" />
+        <ui:Size xsi:nil="true" />
+        <ui:WindowState xsi:nil="true" />
+      </Expression>
+    </Nodes>
+    <Edges>
+      <Edge From="0" To="1" Label="Source1" />
+      <Edge From="7" To="8" Label="Source1" />
+      <Edge From="9" To="10" Label="Source1" />
+      <Edge From="11" To="12" Label="Source1" />
+    </Edges>
+  </Workflow>
+</WorkflowBuilder>

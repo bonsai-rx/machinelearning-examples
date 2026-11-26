@@ -54,3 +54,16 @@
   href: ../examples/PointProcessDecoder/DecodePositionFromStriatumSortedUnits/README.md
 - name: Classify Dynamics and Decode Position from Hippocampal Sorted Units 
   href: ../examples/PointProcessDecoder/ClassifyPositionFromHippocampusSortedUnits/README.md
+
+- name: Principal Component Analysis (PCA)
+  items:
+    - name: Batch Fitting of PCA on MNIST Data
+      href: ../examples/PrincipalComponentAnalysis/BatchFit/README.md
+    - name: Online Fitting of PCA on MNIST Data
+      href: ../examples/PrincipalComponentAnalysis/StreamingOnline/README.md
+    - name: Tracking a Rotating Axis with Online PCA
+      href: ../examples/PrincipalComponentAnalysis/TrackingRotatingAxis/README.md
+    - name: Estimating the Noise Level with Probabilistic PCA
+      href: ../examples/PrincipalComponentAnalysis/EstimatingNoiseLevel/README.md
+    - name: Online PCA of Striatal Population Activity
+      href: ../examples/PrincipalComponentAnalysis/OnlineLatentsFromStriatum/README.md
