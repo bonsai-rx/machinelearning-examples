@@ -63,3 +63,5 @@
       href: ../examples/PrincipalComponentAnalysis/StreamingOnline/README.md
     - name: Tracking a Rotating Axis with Online PCA
       href: ../examples/PrincipalComponentAnalysis/TrackingRotatingAxis/README.md
+    - name: Estimating the Noise Level with Probabilistic PCA
+      href: ../examples/PrincipalComponentAnalysis/EstimatingNoiseLevel/README.md
