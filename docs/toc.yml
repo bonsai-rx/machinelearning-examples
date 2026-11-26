@@ -65,3 +65,5 @@
       href: ../examples/PrincipalComponentAnalysis/TrackingRotatingAxis/README.md
     - name: Estimating the Noise Level with Probabilistic PCA
       href: ../examples/PrincipalComponentAnalysis/EstimatingNoiseLevel/README.md
+    - name: Online PCA of Striatal Population Activity
+      href: ../examples/PrincipalComponentAnalysis/OnlineLatentsFromStriatum/README.md
