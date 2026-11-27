@@ -232,6 +232,13 @@
               <Name>KalmanFilterParameters</Name>
             </Expression>
             <Expression xsi:type="Combinator">
+              <Combinator xsi:type="p2:SaveKalmanFilterParameters">
+                <p2:Path>../../../../datasets/NeuralLatents</p2:Path>
+                <p2:Overwrite>true</p2:Overwrite>
+                <p2:AddSuffix>None</p2:AddSuffix>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:CreateKalmanFilter">
                 <p2:Type>Float64</p2:Type>
                 <p2:NumStates xsi:nil="true" />
@@ -262,6 +269,7 @@
             <Edge From="9" To="10" Label="Source1" />
             <Edge From="10" To="11" Label="Source1" />
             <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>

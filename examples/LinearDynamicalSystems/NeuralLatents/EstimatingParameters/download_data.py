@@ -11,9 +11,11 @@ base_dir = os.path.join(os.path.realpath(os.path.dirname(__file__)), "..", "..",
 # dandi dataset info
 dandiset_ID = "000140"
 dandi_filenames = [
-    "sub-Jenkins/sub-Jenkins_ses-small_desc-train_behavior+ecephys.nwb",
-    "sub-Jenkins/sub-Jenkins_ses-small_desc-test_ecephys.nwb"
+    "sub-Jenkins/sub-Jenkins_ses-small_desc-train_behavior+ecephys.nwb"
 ]
+
+# fraction of the recording used for estimating parameters, the rest is held out
+train_fraction = 0.8
 
 for dandi_filepath in dandi_filenames:
 
@@ -53,7 +55,18 @@ for dandi_filepath in dandi_filenames:
     # transform binned spikes using square-root transform
     spike_counts = np.sqrt(spike_counts + 0.5)
 
-    output_filename = dandi_filepath.split("/")[-1].replace(".nwb", ".bin")
-    spike_counts.astype(float).tofile(os.path.join(base_dir, output_filename))
+    # split the recording in time into a training part and a held-out part
+    n_train = int(n_bins * train_fraction)
+    train_counts = spike_counts[:, :n_train]
+    heldout_counts = spike_counts[:, n_train:]
 
-    print(f"Processed spikes saved to {os.path.realpath(os.path.join(base_dir, output_filename))}")
+    # the training part is saved as neurons x time, to be read as a single batch
+    train_filename = dandi_filepath.split("/")[-1].replace(".nwb", ".bin")
+    train_counts.astype(float).tofile(os.path.join(base_dir, train_filename))
+
+    # the held-out part is saved as time x neurons, to be read one time bin at a time
+    heldout_filename = train_filename.replace(".bin", "_heldout.bin")
+    heldout_counts.T.astype(float).tofile(os.path.join(base_dir, heldout_filename))
+
+    print(f"Training data ({n_train} time bins) saved to {os.path.realpath(os.path.join(base_dir, train_filename))}")
+    print(f"Held-out data ({n_bins - n_train} time bins) saved to {os.path.realpath(os.path.join(base_dir, heldout_filename))}")

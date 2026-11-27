@@ -17,7 +17,7 @@
           <Nodes>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="dsp:MatrixReader">
-                <dsp:Path>../../../../datasets/sub-Jenkins_ses-small_desc-test_ecephys.bin</dsp:Path>
+                <dsp:Path>..\..\..\..\datasets\sub-Jenkins_ses-small_desc-train_behavior+ecephys_heldout.bin</dsp:Path>
                 <dsp:Offset>0</dsp:Offset>
                 <dsp:SampleRate>100</dsp:SampleRate>
                 <dsp:ChannelCount>142</dsp:ChannelCount>
@@ -55,7 +55,7 @@
           <Nodes>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:LoadKalmanFilterParameters">
-                <p2:Path>/home/nicholas/machinelearning/docs/examples/datasets/NeuralLatents</p2:Path>
+                <p2:Path>../../../../datasets/NeuralLatents</p2:Path>
                 <p2:Type>Float64</p2:Type>
               </Combinator>
             </Expression>
@@ -70,6 +70,8 @@
                 <p2:MeasurementNoiseVariance />
                 <p2:InitialMean />
                 <p2:InitialCovariance />
+                <p2:StateOffset />
+                <p2:ObservationOffset />
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">

@@ -25,10 +25,8 @@
       href: ../examples/LinearDynamicalSystems/LinearRegression/ReceptiveFieldSimpleCell/README.md
   - name: Neural Latents
     items:
-    - name: Estimating Parameters of LDS
+    - name: Estimating Parameters and Online Filtering
       href: ../examples/LinearDynamicalSystems/NeuralLatents/EstimatingParameters/README.md
-    - name: Online Filtering
-      href: ../examples/LinearDynamicalSystems/NeuralLatents/OnlineFiltering/README.md
 
 - name: Hidden Markov Models
   items:
