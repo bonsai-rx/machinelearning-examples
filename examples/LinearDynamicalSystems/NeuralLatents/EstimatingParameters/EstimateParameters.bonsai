@@ -4,9 +4,10 @@
                  xmlns:dsp="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp"
                  xmlns:p1="clr-namespace:Bonsai.ML.Torch;assembly=Bonsai.ML.Torch"
                  xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
                  xmlns:p2="clr-namespace:Bonsai.ML.Lds.Torch;assembly=Bonsai.ML.Lds.Torch"
-                 xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
+                 xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
@@ -64,18 +65,77 @@
         </Workflow>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
+        <Name>Status</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SsidRunning</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="StringProperty">
+                <Value>Stochastic subspace identification running...</Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>EMRunning</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="StringProperty">
+                <Value>Refining parameters with expectation maximization...</Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>KalmanFilterParameters</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="StringProperty">
+                <Value>Inference running with learned parameters...</Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Merge" />
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Text" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="gui:LabelBuilder">
+              <gui:Enabled>true</gui:Enabled>
+              <gui:Visible>true</gui:Visible>
+              <gui:Text>Inference running with learned parameters...</gui:Text>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="6" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="6" Label="Source2" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source3" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="VisualizerMapping" />
+      <Expression xsi:type="GroupWorkflow">
         <Name>LearnParameters</Name>
         <Workflow>
           <Nodes>
             <Expression xsi:type="SubscribeSubject">
               <Name>SpikeCounts</Name>
             </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>SsidRunning</Name>
+            </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p2:ExpectationMaximization">
-                <p2:NumStates>10</p2:NumStates>
-                <p2:MaxIterations>10</p2:MaxIterations>
-                <p2:Tolerance>0.1</p2:Tolerance>
-                <p2:Verbose>true</p2:Verbose>
+              <Combinator xsi:type="p2:StochasticSubspaceIdentification">
+                <p2:TargetNumStates>10</p2:TargetNumStates>
+                <p2:MaxLag>20</p2:MaxLag>
+                <p2:Threshold>0.0001</p2:Threshold>
                 <p2:EstimateTransitionMatrix>true</p2:EstimateTransitionMatrix>
                 <p2:EstimateMeasurementFunction>true</p2:EstimateMeasurementFunction>
                 <p2:EstimateProcessNoiseCovariance>true</p2:EstimateProcessNoiseCovariance>
@@ -83,15 +143,70 @@
                 <p2:EstimateInitialMean>true</p2:EstimateInitialMean>
                 <p2:EstimateInitialCovariance>true</p2:EstimateInitialCovariance>
                 <p2:EstimateStateOffset>false</p2:EstimateStateOffset>
-                <p2:EstimateObservationOffset>false</p2:EstimateObservationOffset>
+                <p2:EstimateObservationOffset>true</p2:EstimateObservationOffset>
               </Combinator>
             </Expression>
-            <Expression xsi:type="ui:VisualizerWindow">
-              <ui:Text>ExpectationMaximization</ui:Text>
-              <ui:Visible>true</ui:Visible>
-              <ui:Location xsi:nil="true" />
-              <ui:Size xsi:nil="true" />
-              <ui:WindowState xsi:nil="true" />
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>EMRunning</Name>
+            </Expression>
+            <Expression xsi:type="rx:SelectMany">
+              <Name>RefineEM</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>SubspaceIdentificationResult</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>SpikeCounts</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>SubspaceIdentificationResult</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Parameters</Selector>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="ModelParameters" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p2:ExpectationMaximization">
+                      <p2:NumStates>10</p2:NumStates>
+                      <p2:MaxIterations>10</p2:MaxIterations>
+                      <p2:Tolerance>0.1</p2:Tolerance>
+                      <p2:Verbose>true</p2:Verbose>
+                      <p2:EstimateTransitionMatrix>true</p2:EstimateTransitionMatrix>
+                      <p2:EstimateMeasurementFunction>true</p2:EstimateMeasurementFunction>
+                      <p2:EstimateProcessNoiseCovariance>true</p2:EstimateProcessNoiseCovariance>
+                      <p2:EstimateMeasurementNoiseCovariance>true</p2:EstimateMeasurementNoiseCovariance>
+                      <p2:EstimateInitialMean>true</p2:EstimateInitialMean>
+                      <p2:EstimateInitialCovariance>true</p2:EstimateInitialCovariance>
+                      <p2:EstimateStateOffset>false</p2:EstimateStateOffset>
+                      <p2:EstimateObservationOffset>true</p2:EstimateObservationOffset>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="2" To="6" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source2" />
+                  <Edge From="6" To="7" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>EMResults</Name>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>EMResults</Name>
             </Expression>
             <Expression xsi:type="rx:Condition">
               <Workflow>
@@ -142,10 +257,34 @@
             <Edge From="3" To="4" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
             <Edge From="5" To="6" Label="Source1" />
-            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
+      <Expression xsi:type="VisualizerMapping" />
+      <Expression xsi:type="gui:TableLayoutPanelBuilder">
+        <gui:Enabled>true</gui:Enabled>
+        <gui:Visible>true</gui:Visible>
+        <gui:ColumnCount>1</gui:ColumnCount>
+        <gui:RowCount>2</gui:RowCount>
+        <gui:ColumnStyles />
+        <gui:RowStyles>
+          <gui:RowStyle>
+            <gui:SizeType>Percent</gui:SizeType>
+            <gui:Height>10</gui:Height>
+          </gui:RowStyle>
+          <gui:RowStyle>
+            <gui:SizeType>Percent</gui:SizeType>
+            <gui:Height>90</gui:Height>
+          </gui:RowStyle>
+        </gui:RowStyles>
+        <gui:CellSpans />
+      </Expression>
+      <Expression xsi:type="VisualizerMapping" />
       <Expression xsi:type="GroupWorkflow">
         <Name>InferNeuralLatents</Name>
         <Workflow>
@@ -219,9 +358,9 @@
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="p2:CreateLinearDynamicalSystemState">
-                      <p2:Type>Float32</p2:Type>
-                      <p2:Mean>[[-8.737335, 0.0842269, 0.009232007, -0.0008691379, -0.01574879, -0.006062153, 0.0008153673, -0.001463936, 0.0005580065, -7.526268E-06]]</p2:Mean>
-                      <p2:Covariance>[[[0.009540861, 0.001642221, -0.0003729272, 0.0001364285, -0.0003722429, -0.0001043696, 3.902293E-05, -2.020181E-05, 1.850796E-05, 1.132543E-05], [0.001642221, 0.005607077, 0.0002884019, 5.757339E-05, -1.882871E-05, 1.61614E-06, 7.674043E-06, -4.401983E-06, -1.133E-06, 4.295156E-07], [-0.0003729272, 0.0002884019, 0.00456911, -9.982559E-05, -3.125695E-07, -1.271387E-06, -1.342541E-06, 2.8035E-06, 5.200116E-07, 2.058647E-08], [0.0001364285, 5.757339E-05, -9.982559E-05, 0.003710471, 5.307371E-07, 4.996915E-07, 3.508996E-06, -1.049549E-07, 9.021393E-07, -2.722985E-07], [-0.0003722429, -1.882871E-05, -3.125695E-07, 5.307371E-07, 0.003082175, -4.211043E-06, 1.827337E-06, -8.512937E-07, 4.143237E-07, 1.848511E-07], [-0.0001043696, 1.61614E-06, -1.271387E-06, 4.996915E-07, -4.211043E-06, 0.001288361, 1.71188E-06, -1.227383E-06, 2.295068E-07, -1.284648E-07], [3.902293E-05, 7.674043E-06, -1.342541E-06, 3.508996E-06, 1.827337E-06, 1.71188E-06, 0.0005039083, -2.359678E-07, -8.154034E-08, -1.028429E-07], [-2.020181E-05, -4.401983E-06, 2.8035E-06, -1.049549E-07, -8.512937E-07, -1.227383E-06, -2.359678E-07, 0.0004041222, -5.05107E-09, 1.07337E-08], [1.850796E-05, -1.133E-06, 5.200116E-07, 9.021393E-07, 4.143237E-07, 2.295068E-07, -8.154034E-08, -5.05107E-09, 0.0001370257, -3.074566E-08], [1.132543E-05, 4.295156E-07, 2.058647E-08, -2.722985E-07, 1.848511E-07, -1.284648E-07, -1.028429E-07, 1.07337E-08, -3.074566E-08, 4.862578E-05]]]</p2:Covariance>
+                      <p2:Type>Float64</p2:Type>
+                      <p2:Mean>[[-0.197310548523365, 0.0592322550100998, 0.00543534119199864, 0.0659767165954484, -0.0736605982565688, 0.0240421203590549, 0.0637660569362215, -0.0201890681092028, 0.0827473113379606, -0.0172682438686996]]</p2:Mean>
+                      <p2:Covariance>[[[0.00198022051718438, 0.000119634644101397, -0.000143895230053404, 0.000198425348555168, -7.39302946984308E-05, 7.73498824973273E-05, 0.000174146530482193, 7.11094264990166E-05, -7.76295232763669E-05, 5.2329257159767E-05], [0.000119634644101397, 0.00197275706112312, 0.000101801728092336, -6.76723760250456E-05, -3.15774334266824E-05, -7.17062113674261E-05, 6.12372737247475E-05, -7.56863173709671E-05, 1.89720759210358E-05, 5.60024502121974E-05], [-0.000143895230053404, 0.000101801728092336, 0.00164917904998471, -8.26627447220503E-05, -4.97279994113936E-05, -7.92174214332562E-05, 8.59449138605976E-06, 0.000108291185807156, 4.26006710829378E-05, 6.92248615421472E-05], [0.000198425348555168, -6.76723760250455E-05, -8.26627447220503E-05, 0.00152242297053356, -9.75538344077368E-05, -4.25863948280767E-05, -4.44716118246251E-05, 3.52280709447481E-05, 3.74427163176219E-05, -4.53638898493195E-05], [-7.39302946984306E-05, -3.15774334266823E-05, -4.97279994113937E-05, -9.75538344077369E-05, 0.00116679176389721, -8.37590032812381E-05, 1.76937841339057E-06, 4.23365718280711E-05, 2.89043315093963E-05, 1.05284510090016E-05], [7.73498824973273E-05, -7.17062113674262E-05, -7.9217421433256E-05, -4.25863948280767E-05, -8.3759003281238E-05, 0.000895424129535156, -0.000168140459682537, 5.96418003902011E-05, -3.81051836309549E-05, -5.02874710417762E-07], [0.000174146530482193, 6.12372737247474E-05, 8.59449138606005E-06, -4.44716118246251E-05, 1.76937841339057E-06, -0.000168140459682537, 0.000818830025100351, -4.63979546142117E-05, -1.32613608789491E-05, -1.67599107734281E-05], [7.11094264990171E-05, -7.56863173709673E-05, 0.000108291185807156, 3.52280709447481E-05, 4.2336571828071E-05, 5.96418003902011E-05, -4.6397954614212E-05, 0.000846722120912119, 7.72329858291457E-05, -4.62060006779959E-06], [-7.76295232763666E-05, 1.89720759210359E-05, 4.26006710829378E-05, 3.74427163176217E-05, 2.89043315093964E-05, -3.8105183630955E-05, -1.32613608789492E-05, 7.72329858291456E-05, 0.000680260149474697, 1.56810449105507E-05], [5.23292571597672E-05, 5.60024502121974E-05, 6.92248615421473E-05, -4.53638898493196E-05, 1.05284510090015E-05, -5.02874710417906E-07, -1.67599107734283E-05, -4.62060006779956E-06, 1.56810449105507E-05, 0.000410934350380781]]]</p2:Covariance>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="WorkflowOutput" />
@@ -266,6 +405,16 @@
           </Edges>
         </Workflow>
       </Expression>
+      <Expression xsi:type="VisualizerMapping" />
+      <Expression xsi:type="gui:TableLayoutPanelBuilder">
+        <gui:Enabled>true</gui:Enabled>
+        <gui:Visible>true</gui:Visible>
+        <gui:ColumnCount>2</gui:ColumnCount>
+        <gui:RowCount>1</gui:RowCount>
+        <gui:ColumnStyles />
+        <gui:RowStyles />
+        <gui:CellSpans />
+      </Expression>
       <Expression xsi:type="ui:VisualizerWindow">
         <ui:Text>NeuralLatents</ui:Text>
         <ui:Visible>true</ui:Visible>
@@ -275,7 +424,15 @@
       </Expression>
     </Nodes>
     <Edges>
-      <Edge From="2" To="3" Label="Source1" />
+      <Edge From="1" To="2" Label="Source1" />
+      <Edge From="2" To="5" Label="Source1" />
+      <Edge From="3" To="4" Label="Source1" />
+      <Edge From="4" To="5" Label="Source2" />
+      <Edge From="5" To="6" Label="Source1" />
+      <Edge From="6" To="9" Label="Source1" />
+      <Edge From="7" To="8" Label="Source1" />
+      <Edge From="8" To="9" Label="Source2" />
+      <Edge From="9" To="10" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
